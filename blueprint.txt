@@ -82,4 +82,4 @@ Python counterparts:
 	- ? Flask-Heroku: 
 	- ? Flask-Login / Flask-Principal / Flask-Security / Flask-User: 
 	- ? Flask-Mail: 
-	- ? Flask-Uploads: 
+	

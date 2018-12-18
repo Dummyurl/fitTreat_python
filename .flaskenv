@@ -1,1 +1,2 @@
 FLASK_APP=fit.py
+FLASK_DEBUG=1
