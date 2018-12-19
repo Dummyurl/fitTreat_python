@@ -3,16 +3,28 @@ Created on 18-Dec-2018
 
 @author: Balkrishna.Meena
 '''
-from flask_mongoengine import Document
-from mongoengine.fields import StringField, EmailField, DateTimeField, IntField
-from mongoengine.base.fields import BaseField
 from datetime import datetime
+
+from djangotoolbox.fields import ListField
+from flask_mongoengine import Document
+from mongoengine.base.fields import BaseField
+from mongoengine.document import EmbeddedDocument
+from mongoengine.fields import StringField, EmailField, DateTimeField, IntField, \
+    EmbeddedDocumentField, ReferenceField, BooleanField
+
+from models.meal import Meal
+
+
+class Messages(EmbeddedDocument):
+    subjec = StringField()
+    createDate =  DateTimeField(default = datetime.now)
+    readFlag = BooleanField(default=False)
+    content = StringField()   
 
 class User(Document):
     firstName = StringField(required=True)
     lastName = StringField(required=True,default='')
     email = EmailField(required=True)
-    '''
     gender = BaseField(required=True,default='Male',choices=['Male','Female','Other'])
     password = StringField(required=True)
     resetPasswordToken = StringField()
@@ -32,14 +44,8 @@ class User(Document):
     targetDate = StringField(default='') # YYYY/MM/DD format
     targetCalories = IntField(default=0)
     accountCreationDate = DateTimeField(default=datetime.now)
+    userPhoto = StringField()
+    messages = ListField(EmbeddedDocumentField(Messages))
+    mealAssigned = ListField(ReferenceField(Meal))
+    mealExpiry = IntField(default=0)
     
-    userPhoto = {
-        type:String,
-        default:""
-    },
-    messages:[MessageSchema],
-    mealAssigned:[{type:Schema.Types.ObjectId,ref:'meal'}],
-    mealExpiry:{
-        type:Number,
-        default:0
-    }'''

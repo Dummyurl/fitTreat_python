@@ -7,5 +7,5 @@ from flask_mongoengine import Document
 from mongoengine.fields import StringField
 
 class AppData(Document):
-    aboutSection:StringField()
-    references:StringField()
+    aboutSection=StringField()
+    references=StringField()
