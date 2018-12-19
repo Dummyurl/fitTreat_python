@@ -1,15 +1,18 @@
 from flask import render_template, redirect, url_for, jsonify
-from app import app
 from app.models import User
+from app import app
+
 
 @app.route('/')
 def index():
     return app.send_static_file('index.html')
 
+
 @app.route('/home')
 def home():
     user = {'username': 'Saurabh'}
     return render_template('home.html', title='Home', user=user)
+
 
 @app.route('/addUser/<email>/<fname>/<lname>', methods=['POST', 'GET'])
 def addUser(email, fname, lname):
