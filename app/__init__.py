@@ -1,15 +1,17 @@
 import os
 from flask import Flask
+from flask_cors import CORS
 from flask_mongoengine import MongoEngine
 from config import Config
 
 app = Flask(__name__, static_url_path="/public", static_folder="public")
-
+CORS(app)
 app.config.from_object(Config)
 mdb = MongoEngine(app)
 
-from app import routes, models
+from app import models
 from app.jsonSerializer import Encoder
+from app.routes import test_routes, admin_routes, api_routes, auth_routes
 
 app.json_encoder = Encoder
 

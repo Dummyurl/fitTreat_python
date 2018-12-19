@@ -1,6 +1,24 @@
-from flask import render_template, redirect, url_for, jsonify
-from app.models import User
+from flask import render_template, redirect, url_for, jsonify, request
+from app.models.user import User
 from app import app
+
+
+@app.errorhandler(404)
+def handleError404(e):
+    print(e)
+    return 'Oops. Looks like you have entered a wrong link. Please check the link and try again.'
+
+
+@app.errorhandler(500)
+def handleError500(e):
+    print(e)
+    return 'Oops. Something went wrong. Please try again. If problem persists please contact system administrator.'
+
+
+@app.errorhandler(403)
+def handleError403(e):
+    print(e)
+    return 'Oops. You are not allowed to access this URL. Please check with system administrator.'
 
 
 @app.route('/')
@@ -61,3 +79,26 @@ def deleteUser(email):
         return 'User deleted'
 
     return 'User not deleted'
+
+
+@app.route('/postdata', methods=['POST'])
+def postData():
+    print('data')
+    print(request.data)
+
+    print('args')
+    print(request.args)
+
+    print('files')
+    print(request.files)
+
+    print('form')
+    print(request.form)
+
+    print('values')
+    print(request.values)
+
+    print('json')
+    print(request.get_json())
+
+    return 'Done'

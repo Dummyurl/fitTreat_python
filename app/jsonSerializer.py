@@ -1,6 +1,6 @@
 from flask.json import JSONEncoder
 from flask_mongoengine import BaseQuerySet
-from app.models import User
+from app.models.user import User
 
 
 class Encoder(JSONEncoder):
