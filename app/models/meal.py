@@ -7,7 +7,7 @@ Created on 18-Dec-2018
 from flask_mongoengine import Document
 from mongoengine.fields import StringField, IntField
 from mongoengine.base.fields import BaseField
-from djangotoolbox.fields import ListField
+from mongoengine.fields import ListField
 class Meal(Document):
     name=StringField(required=True)
     foodPreference= BaseField(default='Vegetarian', choices=["Vegan", "Vegetarian", "Non-Vegetarian"])

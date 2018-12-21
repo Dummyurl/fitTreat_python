@@ -5,7 +5,7 @@ Created on 18-Dec-2018
 '''
 from flask_mongoengine import Document
 from mongoengine.fields import StringField, ReferenceField
-from models.medicines import Medicine
+from app.models.medicines import Medicine
 
 class Symptom(Document):
     name= StringField(required=True)

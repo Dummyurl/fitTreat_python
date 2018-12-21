@@ -5,21 +5,22 @@ Created on 18-Dec-2018
 '''
 from datetime import datetime
 
-from djangotoolbox.fields import ListField
+from mongoengine.fields import ListField
 from flask_mongoengine import Document
 from mongoengine.base.fields import BaseField
 from mongoengine.document import EmbeddedDocument
 from mongoengine.fields import StringField, EmailField, DateTimeField, IntField, \
     EmbeddedDocumentField, ReferenceField, BooleanField
 
-from models.meal import Meal
+from app.models.meal import Meal
 
 
 class Messages(EmbeddedDocument):
-    subjec = StringField()
-    createDate =  DateTimeField(default = datetime.now)
+    subject = StringField()
+    createDate = DateTimeField(default = datetime.now)
     readFlag = BooleanField(default=False)
     content = StringField()   
+
 
 class User(Document):
     firstName = StringField(required=True)
@@ -30,7 +31,7 @@ class User(Document):
     resetPasswordToken = StringField()
     resetPasswordExpires = DateTimeField()
     role = BaseField(default='User',choices=['User','Admin'])
-    dateOfBirth = StringField(required=True) # YYYY/MM/DD Format
+    dateOfBirth = StringField(required=True)  # YYYY/MM/DD Format
     age = IntField(required=True,default=0) 
     weight = IntField(required=True,default=0) 
     weightUnit = BaseField(required=True,default='kg',choices=['kg','lb'])
@@ -41,11 +42,10 @@ class User(Document):
     bmi = IntField(default=0)
     medicalCondition = StringField()
     targetWeight = IntField(default=0)
-    targetDate = StringField(default='') # YYYY/MM/DD format
+    targetDate = StringField(default='')  # YYYY/MM/DD format
     targetCalories = IntField(default=0)
     accountCreationDate = DateTimeField(default=datetime.now)
     userPhoto = StringField()
     messages = ListField(EmbeddedDocumentField(Messages))
     mealAssigned = ListField(ReferenceField(Meal))
     mealExpiry = IntField(default=0)
-    
