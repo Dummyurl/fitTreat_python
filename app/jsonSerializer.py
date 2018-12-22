@@ -11,11 +11,12 @@ class Encoder(JSONEncoder):
         print(type(obj))
         if isinstance(obj, User):
             return {
+                '_id' : str(obj.id),
                 'email': obj.email,
                 'firstName': obj.firstName,
                 'lastName': obj.lastName,
                 'gender': obj.gender,
-                'password': obj.password,
+                # 'password': obj.password,
                 'resetPasswordToken': obj.resetPasswordToken,
                 'resetPasswordExpires': obj.resetPasswordExpires,
                 'role': obj.role,
@@ -38,8 +39,17 @@ class Encoder(JSONEncoder):
                 'mealAssigned': [Meal.objects(_id=meal._id) for meal in obj.mealAssigned],
                 'mealExpiry': obj.mealExpiry
             }
+        elif isinstance(obj,Messages):
+            return {
+                '_id':str(obj._id),
+                'subject':obj.subject,
+                'content':obj.content,
+                'createDate':obj.createDate,
+                'readFlag':obj.readFlag
+            }
         elif isinstance(obj, Meal):
             return {
+                'id':str(obj.id),
                 'name': obj.name,
                 'foodPreference': obj.foodPreference,
                 'cuisine': obj.cuisine,
@@ -55,6 +65,7 @@ class Encoder(JSONEncoder):
             }
         elif isinstance(obj, Medicine):
             return {
+                'id': str(obj.id),
                 'name': obj.name,
                 'dosage': obj.dosage,
                 'instructions': obj.instructions,
@@ -62,6 +73,7 @@ class Encoder(JSONEncoder):
             }
         elif isinstance(obj, Symptom):
             return {
+                'id': str(obj.id),
                 'name': obj.name,
                 'indications': obj.indications,
                 'medicines': [Medicine.objects(_id = med._id) for med in obj.medicines]

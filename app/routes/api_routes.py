@@ -1,10 +1,11 @@
 from flask import render_template, redirect, url_for, jsonify, request
 from app import app
+from app.controller import user_controller
 
 
 @app.route('/api/loggedInUser/<id>')
 def loggedInUser(id):
-    pass
+    return user_controller.activeUser(id)
 
 
 @app.route('/api/changePassword/<email>')

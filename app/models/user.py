@@ -5,21 +5,22 @@ Created on 18-Dec-2018
 '''
 from datetime import datetime
 
+from bson import ObjectId
 from mongoengine.fields import ListField
 from flask_mongoengine import Document
-from mongoengine.base.fields import BaseField
+from mongoengine.base.fields import BaseField, ObjectIdField
 from mongoengine.document import EmbeddedDocument
 from mongoengine.fields import StringField, EmailField, DateTimeField, IntField, \
     EmbeddedDocumentField, ReferenceField, BooleanField
 
 from app.models.meal import Meal
 
-
 class Messages(EmbeddedDocument):
     subject = StringField()
     createDate = DateTimeField(default = datetime.now)
     readFlag = BooleanField(default=False)
-    content = StringField()   
+    content = StringField()
+    _id = ObjectIdField(default= ObjectId)
 
 
 class User(Document):
