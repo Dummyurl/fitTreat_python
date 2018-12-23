@@ -9,7 +9,7 @@ from mongoengine.fields import StringField, IntField
 from mongoengine.base.fields import BaseField
 from mongoengine.fields import ListField
 class Meal(Document):
-    name=StringField(required=True)
+    name=StringField(required=True, unique=True)
     foodPreference= BaseField(default='Vegetarian', choices=["Vegan", "Vegetarian", "Non-Vegetarian"])
     cuisine= StringField()
     dietType= ListField(StringField(),default=['No Data Available'])

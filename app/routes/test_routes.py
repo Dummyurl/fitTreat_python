@@ -6,19 +6,19 @@ from app import app
 @app.errorhandler(404)
 def handleError404(e):
     print(e)
-    return 'Oops. Looks like you have entered a wrong link. Please check the link and try again.'
+    return 'Oops. Looks like you have entered a wrong link. Please check the link and try again.', 404
 
 
 @app.errorhandler(500)
 def handleError500(e):
     print(e)
-    return 'Oops. Something went wrong. Please try again. If problem persists please contact system administrator.'
+    return 'Oops. Something went wrong. Please try again. If problem persists please contact system administrator.', 500
 
 
 @app.errorhandler(403)
 def handleError403(e):
     print(e)
-    return 'Oops. You are not allowed to access this URL. Please check with system administrator.'
+    return 'Oops. You are not allowed to access this URL. Please check with system administrator.', 403
 
 
 @app.route('/')

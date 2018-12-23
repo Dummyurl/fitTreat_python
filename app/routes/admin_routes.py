@@ -1,75 +1,75 @@
 from flask import render_template, redirect, url_for, jsonify, request
 from app import app
-
+from app.controller import appData_controller, user_controller, meal_controller, medicine_controller, symptom_controller
 
 @app.route('/admin/editAppData/<id>', methods=['PUT'])
 def editAppData(id):
-    pass
+    return appData_controller.setAppDefaultData(id) #done
 
 
 @app.route('/admin/addMeals', methods=['POST'])
 def addMeals():
-    pass
+    return meal_controller.addMealData()
 
 
 @app.route('/admin/addNewMeal', methods=['POST'])
 def addNewMeal():
-    pass
+    return meal_controller.addNewMeal() #done
 
 
 @app.route('/admin/updateMeal/<id>', methods=['PUT'])
 def updateMeal(id):
-    pass
+    return meal_controller.updateMeal(id) #done
 
 
 @app.route('/admin/deleteMeal/<id>', methods=['DELETE'])
 def deleteMeal(id):
-    pass
+    return meal_controller.deleteMeal(id) #done
 
 
 @app.route('/admin/getMealsList')
 def getMealsList():
-    pass
+    return meal_controller.getMealsList() #done
 
 
 @app.route('/admin/addMedicines', methods=['POST'])
 def addMedicines():
-    pass
+    return medicine_controller.addMedicines() #done
 
 
 @app.route('/admin/addNewMedicine', methods=['POST'])
 def addNewMedicine():
-    pass
+    return medicine_controller.addNewMedicine() #done
 
 
 @app.route('/admin/getAllMeds')
 def getAllMeds():
-    pass
+    return medicine_controller.getAllMedicines() #done
 
 
 @app.route('/admin/deleteMeds', methods=['POST'])
 def deleteMeds():
-    pass
+    return medicine_controller.deleteMeds() #done
 
 
 @app.route('/admin/addSymptoms', methods=['POST'])
 def addSymptoms():
-    pass
+    return symptom_controller.addMedicineData()
 
 
 @app.route('/admin/addNewSymptom', methods=['POST'])
 def addNewSymptom():
-    pass
+    return symptom_controller.addNewSymptom() #done
 
 
 @app.route('/admin/getAllSymptoms')
 def getAllSymptoms():
-    pass
+    return symptom_controller.getAllSymptoms() #done
 
 
 @app.route('/admin/deleteSymptopms', methods=['POST'])
 def deleteSymptopms():
-    pass
+    return symptom_controller.deleteSymptoms() #done
 
 
 @app.route('/admin/dbStats')
@@ -79,7 +79,13 @@ def dbStats():
 
 @app.route('/admin/templateDownload/<name>')
 def templateDownload(name):
-    pass
+    filePath = {
+        'meal':'mealData.xlsx',
+        'medicine':'medicineData.json',
+        'symptoms':'SymptomsData.json'
+    }
+
+    return app.send_static_file(filePath[name]) #done
 
 
 @app.route('/admin/deleteCollection/<name>', methods=['DELETE'])

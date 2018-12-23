@@ -4,12 +4,19 @@ from app.models.user import User, Messages
 from app.models.meal import Meal
 from app.models.medicines import Medicine
 from app.models.symptoms import Symptom
+from app.models.appData import AppData
 
+from mongoengine import DoesNotExist
 
 class Encoder(JSONEncoder):
     def default(self, obj):
-        print(type(obj))
-        if isinstance(obj, User):
+        if isinstance(obj, AppData):
+            return {
+                '_id': str(obj.id),
+                'aboutSection': obj.aboutSection,
+                'references': obj.references
+            }
+        elif isinstance(obj, User):
             return {
                 '_id' : str(obj.id),
                 'email': obj.email,
@@ -36,7 +43,7 @@ class Encoder(JSONEncoder):
                 'accountCreationDate': obj.accountCreationDate,
                 'userPhoto': obj.userPhoto,
                 'messages': [msg for msg in obj.messages],
-                'mealAssigned': [Meal.objects(_id=meal._id) for meal in obj.mealAssigned],
+                'mealAssigned': populate(modelName='Meal', docs=obj.mealAssigned),
                 'mealExpiry': obj.mealExpiry
             }
         elif isinstance(obj,Messages):
@@ -49,7 +56,7 @@ class Encoder(JSONEncoder):
             }
         elif isinstance(obj, Meal):
             return {
-                'id':str(obj.id),
+                '_id':str(obj.id),
                 'name': obj.name,
                 'foodPreference': obj.foodPreference,
                 'cuisine': obj.cuisine,
@@ -65,7 +72,7 @@ class Encoder(JSONEncoder):
             }
         elif isinstance(obj, Medicine):
             return {
-                'id': str(obj.id),
+                '_id': str(obj.id),
                 'name': obj.name,
                 'dosage': obj.dosage,
                 'instructions': obj.instructions,
@@ -73,10 +80,10 @@ class Encoder(JSONEncoder):
             }
         elif isinstance(obj, Symptom):
             return {
-                'id': str(obj.id),
+                '_id': str(obj.id),
                 'name': obj.name,
                 'indications': obj.indications,
-                'medicines': [Medicine.objects(_id = med._id) for med in obj.medicines]
+                'medicines': populate(modelName='Medicine', docs=obj.medicines)
             }
         elif isinstance(obj, BaseQuerySet):
             ret = []
@@ -88,7 +95,7 @@ class Encoder(JSONEncoder):
 
 class Decoder(JSONDecoder):
     def default(self, obj):
-        print(type(obj))
+        #print(type(obj))
         if isinstance(obj, User):
             return {
                 'email': obj.email,
@@ -107,3 +114,15 @@ class Decoder(JSONDecoder):
                 ret.append(self.default(o))
             return ret
         return super(Decoder, self).default(obj)
+
+
+def populate(modelName, docs):
+    ret = []
+    
+    for doc in docs:
+        try:
+            ret.append(globals()[modelName].objects(id = doc.id).get())
+        except DoesNotExist:
+            pass
+
+    return ret

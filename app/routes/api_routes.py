@@ -1,6 +1,6 @@
 from flask import render_template, redirect, url_for, jsonify, request
 from app import app
-from app.controller import user_controller
+from app.controller import user_controller, appData_controller, symptom_controller
 
 
 @app.route('/api/loggedInUser/<id>')
@@ -60,17 +60,17 @@ def filterMeals(type, foodPref, userId):
 
 @app.route('/api/initialSymptoms')
 def initialSymptoms():
-    pass
+    return symptom_controller.first5Symptoms() #done
 
 
 @app.route('/api/searchSymptoms/<searchParam>')
 def searchSymptoms(searchParam):
-    pass
+    return symptom_controller.searchSymptom(searchParam=searchParam) #done
 
 
 @app.route('/api/getAppData')
 def getAppData():
-    pass
+    return appData_controller.getAppDefaultData() #done
 
 
 @app.route('/api/sendMsgToAdmin', methods=['POST'])

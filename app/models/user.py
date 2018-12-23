@@ -18,9 +18,9 @@ from app.models.meal import Meal
 class Messages(EmbeddedDocument):
     subject = StringField()
     createDate = DateTimeField(default = datetime.now)
-    readFlag = BooleanField(default=False)
+    readFlag = BooleanField(default = False)
     content = StringField()
-    _id = ObjectIdField(default= ObjectId)
+    _id = ObjectIdField(default = ObjectId)
 
 
 class User(Document):

@@ -5,10 +5,11 @@ Created on 18-Dec-2018
 '''
 from flask_mongoengine import Document
 from mongoengine.fields import StringField, ReferenceField
+from mongoengine.fields import ListField
 from app.models.medicines import Medicine
 
 class Symptom(Document):
-    name= StringField(required=True)
+    name= StringField(required=True, unique=True)
     indications=StringField()
-    medicines=ReferenceField(Medicine)
+    medicines=ListField(ReferenceField(Medicine))
     
