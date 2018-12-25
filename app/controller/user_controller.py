@@ -32,7 +32,7 @@ def register():
             gender=data.gender,
             password=data.password,
             dateOfBirth=data.dateOfBirth,
-            age=data.age,
+            age=data.age if data.age else 0,
             weight=data.weight,
             weightUnit=data.weightUnit,
             height=data.height,
@@ -40,7 +40,7 @@ def register():
             foodPreference=data.foodPreference,
             timeZone=data.timeZone,
             medicalCondition=data.medicalCondition,
-            messages = [Messages(subject="Welcome", content=msg_content)]
+            messages=[Messages(subject="Welcome", content=msg_content)]
         )
         user = user.save()
         user['password'] = None

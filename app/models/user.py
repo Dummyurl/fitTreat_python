@@ -4,7 +4,9 @@ Created on 18-Dec-2018
 @author: Balkrishna.Meena
 '''
 from datetime import datetime
-
+import flask_bcrypt
+from mongoengine.signals import pre_save
+from dateutil import parser,relativedelta
 from bson import ObjectId
 from mongoengine.fields import ListField
 from flask_mongoengine import Document
@@ -14,6 +16,8 @@ from mongoengine.fields import StringField, EmailField, DateTimeField, IntField,
     EmbeddedDocumentField, ReferenceField, BooleanField
 
 from app.models.meal import Meal
+
+
 class Messages(EmbeddedDocument):
     subject = StringField()
     createDate = DateTimeField(default = datetime.now)
@@ -50,3 +54,14 @@ class User(Document):
     mealAssigned = ListField(ReferenceField(Meal))
     mealExpiry = IntField(default=0)
     unreadCount = IntField(default=0)
+
+
+def pre_save_func(sender,document):
+    document['password'] = str(flask_bcrypt.generate_password_hash(document['password'], 5))
+    dob = parser.parse(document['dateOfBirth'])
+    today = datetime.today()
+    age = relativedelta.relativedelta(today, dob)
+    document['age'] = age.years
+
+
+pre_save.connect(pre_save_func)
