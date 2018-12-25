@@ -2,7 +2,7 @@ from flask import render_template, redirect, url_for, jsonify, request
 from app import app
 from app.controller import user_controller, appData_controller, symptom_controller
 
-# Pull Active User Details
+''' /*** Pull Active User Details ***/ ''' # done
 
 
 @app.route('/api/loggedInUser/<user_id>')
@@ -24,7 +24,8 @@ def passwordResetRedirect():
 def resetPassword():
     pass
 
-# Change status of message to read/unread
+
+''' /*** Change status of message to read/unread ***/ ''' # done
 
 
 @app.route('/api/readMessage/<user_id>/<msg_id>')

@@ -105,7 +105,7 @@ def clearDB():
     pass
 
 
-''' /*** Send Message to a user ***/ '''
+''' /*** Send Message to a user ***/ '''  # done
 
 
 @app.route('/admin/sendMsgToUser',methods=['POST'])
