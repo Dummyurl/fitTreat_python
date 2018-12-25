@@ -57,7 +57,7 @@ class User(Document):
 
 
 def pre_save_func(sender,document):
-    document['password'] = str(flask_bcrypt.generate_password_hash(document['password'], 5))
+    document['password'] = str(flask_bcrypt.generate_password_hash(document['password']).decode('utf-8'))
     dob = parser.parse(document['dateOfBirth'])
     today = datetime.today()
     age = relativedelta.relativedelta(today, dob)
