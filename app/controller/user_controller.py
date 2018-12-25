@@ -3,17 +3,18 @@ Created on 19-Dec-2018
 
 @author: Balkrishna.Meena
 '''
-import json
-from typing import Any, Union
 
+from typing import Any, Union
 import bson
 from flask import request
 from flask.json import jsonify
-
 from app.models.user import User, Messages
 from attrdict import AttrDict
 from mongoengine import DoesNotExist
-import mongoengine
+
+
+'''    /*** New Registration ***/ '''
+
 
 def register():
     data = AttrDict(request.get_json())
@@ -23,7 +24,7 @@ def register():
         obj['error'] = "Email already in use"
         return jsonify(obj)
     except DoesNotExist:
-        msg_content: str = "Dear " + data.firstName + ", <br><br> Welcome to FitTreat.<br><br> Team FitTreat";
+        msg_content: str = "Dear " + data.firstName + ", <br><br> Welcome to FitTreat.<br><br> Team FitTreat"
         user = User(
             firstName=data.firstName,
             lastName=data.lastName,
@@ -42,17 +43,44 @@ def register():
             messages = [Messages(subject="Welcome", content=msg_content)]
         )
         user = user.save()
+        user['password'] = None
+        unreadMsg = [msg for msg in user['messages'] if msg['readFlag'] is False]
+        user['unreadCount'] = len(unreadMsg)
         return jsonify(user)
 
 
-def activeUser(id):
+''' /*** Returns Active User Details ***/ '''
+
+
+def activeUser(user_id):
     try:
-        user = User.objects.get(id=bson.objectid.ObjectId(str(id)))
-        json_resp = jsonify(user)
+        user = User.objects.get(id=bson.objectid.ObjectId(str(user_id)))
+        user['password'] = None
         user['mealAssigned'] = None
-        unreadMsg = [msg for msg in user['messages'] if msg['readFlag'] == False]
+        unreadMsg = [msg for msg in user['messages'] if msg['readFlag'] is False]
         user['unreadCount'] = len(unreadMsg)
+        json_resp = jsonify(user)
         return json_resp
     except DoesNotExist as e:
         return 'Some error occurred : ' + str(e)
 
+
+''' /*** Updates message read/unread status ***/ '''
+
+
+def messageReadStatusChange(user_id,msg_id):
+    try:
+        user = User.objects.get(id=bson.objectid.ObjectId(str(user_id)))
+        # message = [msg for msg in user['messages']]
+        for msg in user['messages']:
+            if(str(msg['_id']) == msg_id):
+                print('Message Found')
+                msg['readFlag'] =  not (msg['readFlag'])
+                try:
+                    msg.save()
+                    return jsonify(msg)
+                except Exception as e:
+                    print(e)
+                    return 'Error in saving message status'
+    except Exception as e:
+        return 'Some error occurred : ' + str(e)

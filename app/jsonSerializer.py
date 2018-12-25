@@ -44,7 +44,8 @@ class Encoder(JSONEncoder):
                 'userPhoto': obj.userPhoto,
                 'messages': [msg for msg in obj.messages],
                 'mealAssigned': populate(modelName='Meal', docs=obj.mealAssigned),
-                'mealExpiry': obj.mealExpiry
+                'mealExpiry': obj.mealExpiry,
+                'unreadCount':obj.unreadCount
             }
         elif isinstance(obj,Messages):
             return {
@@ -118,7 +119,6 @@ class Decoder(JSONDecoder):
 
 def populate(modelName, docs):
     ret = []
-    
     for doc in docs:
         try:
             ret.append(globals()[modelName].objects(id = doc.id).get())

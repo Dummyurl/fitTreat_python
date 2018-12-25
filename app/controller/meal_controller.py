@@ -3,6 +3,7 @@ from flask.json import jsonify
 
 from app.models.meal import Meal
 from app.models.user import User
+from attrdict import  AttrDict
 
 from config import Config
 
@@ -73,10 +74,9 @@ def updateMeal(id):
 def deleteMeal(id):
     try:
         delMeal = Meal.objects(id=id)
-        
         if delMeal:
-            delMeal = delMeals.delete()
-            return jsonify(delMeals)
+            delMeal = delMeal.delete()
+            return jsonify(delMeal)
         else:
             return 'Meals not deleted', 400
     except Exception as e:

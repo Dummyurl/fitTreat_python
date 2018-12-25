@@ -2,10 +2,12 @@ from flask import render_template, redirect, url_for, jsonify, request
 from app import app
 from app.controller import user_controller, appData_controller, symptom_controller
 
+# Pull Active User Details
 
-@app.route('/api/loggedInUser/<id>')
-def loggedInUser(id):
-    return user_controller.activeUser(id)
+
+@app.route('/api/loggedInUser/<user_id>')
+def loggedInUser(user_id):
+    return user_controller.activeUser(user_id)
 
 
 @app.route('/api/changePassword/<email>')
@@ -22,10 +24,12 @@ def passwordResetRedirect():
 def resetPassword():
     pass
 
+# Change status of message to read/unread
 
-@app.route('/api/readMessage/<docId>/<msgId>')
-def readMessage(docId, msgId):
-    pass
+
+@app.route('/api/readMessage/<user_id>/<msg_id>')
+def readMessage(user_id, msg_id):
+    return user_controller.messageReadStatusChange(user_id,msg_id)
 
 
 @app.route('/api/targetWeight', methods=['PUT'])

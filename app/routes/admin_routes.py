@@ -1,6 +1,13 @@
-from flask import render_template, redirect, url_for, jsonify, request
+from attrdict import AttrDict
+from flask import request
+from flask.json import jsonify
+from flask_api import status
+from mongoengine import DoesNotExist, OperationError
+from app.models.user import User,Messages
+import bson
 from app import app
-from app.controller import appData_controller, user_controller, meal_controller, medicine_controller, symptom_controller
+from app.controller import appData_controller, meal_controller, medicine_controller, symptom_controller
+
 
 @app.route('/admin/editAppData/<id>', methods=['PUT'])
 def editAppData(id):
@@ -96,3 +103,26 @@ def deleteCollection(name):
 @app.route('/admin/clearDB')
 def clearDB():
     pass
+
+
+''' /*** Send Message to a user ***/ '''
+
+
+@app.route('/admin/sendMsgToUser',methods=['POST'])
+def sendMsgToUser():
+    msg_data = AttrDict(request.get_json())
+    user_id = msg_data.userId
+    new_msg = Messages(subject=msg_data.message.subject,content=msg_data.message.content)
+    try:
+        user =User.objects.get(id=bson.objectid.ObjectId(str(user_id)))
+        user['messages'].append(new_msg)
+        user.save()
+        resp = {'stat':"Message Sent Successfully"}
+        return jsonify(resp),status.HTTP_200_OK
+    except DoesNotExist as e:
+        print(e)
+        return str(e),status.HTTP_404_NOT_FOUND
+    except Exception as e:
+        print(e)
+        return  str(e),status.HTTP_500_INTERNAL_SERVER_ERROR
+

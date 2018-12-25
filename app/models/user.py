@@ -14,7 +14,6 @@ from mongoengine.fields import StringField, EmailField, DateTimeField, IntField,
     EmbeddedDocumentField, ReferenceField, BooleanField
 
 from app.models.meal import Meal
-
 class Messages(EmbeddedDocument):
     subject = StringField()
     createDate = DateTimeField(default = datetime.now)
@@ -50,3 +49,4 @@ class User(Document):
     messages = ListField(EmbeddedDocumentField(Messages))
     mealAssigned = ListField(ReferenceField(Meal))
     mealExpiry = IntField(default=0)
+    unreadCount = IntField(default=0)
