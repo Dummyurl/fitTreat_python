@@ -27,8 +27,6 @@ except DoesNotExist:
 except Exception as e:
     print('general error', e)
 
-port = int(os.getenv("PORT") or 8888)
-#print(port)
 
 if __name__ == '__main__':
     pass
@@ -37,4 +35,5 @@ else:
     pass
     #print('running on', __name__)
 
-app.run(host='0.0.0.0', port=port)
+print('App running on port {}'.format(Config.port))
+app.run(host='0.0.0.0', port=Config.port)

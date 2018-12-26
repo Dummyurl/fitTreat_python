@@ -4,7 +4,6 @@ from app.controller import user_controller
 import flask_bcrypt
 from app.models.user import User
 from mongoengine.errors import DoesNotExist
-from flask_api import status
 
 
 @app.route('/auth/test')
@@ -40,8 +39,8 @@ def login():
             user['mealAssigned'] = None
             unreadMsg = [msg for msg in user['messages'] if msg['readFlag'] is False]
             user['unreadCount'] = len(unreadMsg)
-            return jsonify(user),status.HTTP_200_OK
+            return jsonify(user), 200
         else:
-            return jsonify({'error': 'Invalid Credentials'}), status.HTTP_401_UNAUTHORIZED
-    except DoesNotExist as e:
-        return jsonify({'error':'User does not exist'}),status.HTTP_401_UNAUTHORIZED
+            return jsonify({'error': 'Invalid Credentials'}), 401
+    except DoesNotExist:
+        return jsonify({'error':'User does not exist'}), 401

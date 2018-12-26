@@ -1,11 +1,14 @@
 from attrdict import AttrDict
 from flask import request
 from flask.json import jsonify
-from flask_api import status
 from mongoengine import DoesNotExist, OperationError
+from mongoengine.connection import _get_db, _get_connection
 from app.models.user import User,Messages
+from app.models.meal import Meal
+from app.models.medicines import Medicine
+from app.models.symptoms import Symptom
 import bson
-from app import app
+from app import app, mdb
 from app.controller import appData_controller, meal_controller, medicine_controller, symptom_controller
 
 
@@ -81,7 +84,14 @@ def deleteSymptopms():
 
 @app.route('/admin/dbStats')
 def dbStats():
-    pass
+    obj = {
+        'users': User.objects.count(),
+        'meals': Meal.objects.count(),
+        'medicines': Medicine.objects.count(),
+        'symptoms': Symptom.objects.count()
+    }
+
+    return jsonify(obj), 200
 
 
 @app.route('/admin/templateDownload/<name>')
@@ -97,12 +107,33 @@ def templateDownload(name):
 
 @app.route('/admin/deleteCollection/<name>', methods=['DELETE'])
 def deleteCollection(name):
-    pass
+    if(name == 'users'):
+        print('Dropping user collection')
+        User.drop_collection()
+    elif(name == 'meals'):
+        print('Dropping meal collection')
+        Meal.drop_collection()
+    elif(name == 'meds'):
+        print('Dropping medicine collection')
+        Medicine.drop_collection()
+    elif(name == 'symptoms'):
+        print('Dropping symptom collection')
+        Symptom.drop_collection()
+    else:
+        print('Wrong collection name provided: {}'.format(name))
+        return 'Wrong collection name provided: {}'.format(name), 400
+
+    return '{} collection deleted'.format(name), 200 #done
+
 
 
 @app.route('/admin/clearDB')
 def clearDB():
-    pass
+    db = _get_db()
+    conn = _get_connection()
+    conn.drop_database(db)
+
+    return 'DB {} cleared'.format(db.name), 200 #done
 
 
 ''' /*** Send Message to a user ***/ '''  # done
@@ -118,11 +149,11 @@ def sendMsgToUser():
         user['messages'].append(new_msg)
         user.save()
         resp = {'stat':"Message Sent Successfully"}
-        return jsonify(resp),status.HTTP_200_OK
+        return jsonify(resp), 200
     except DoesNotExist as e:
         print(e)
-        return str(e),status.HTTP_404_NOT_FOUND
+        return str(e), 404
     except Exception as e:
         print(e)
-        return  str(e),status.HTTP_500_INTERNAL_SERVER_ERROR
+        return  str(e), 500
 

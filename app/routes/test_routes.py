@@ -29,7 +29,9 @@ def index():
 @app.route('/home')
 def home():
     user = {'username': 'Saurabh'}
-    return render_template('home.html', title='Home', user=user)
+    resp = render_template('home.html', title='Home', user=user)
+    print(resp)
+    return resp
 
 
 @app.route('/addUser/<email>/<fname>/<lname>', methods=['POST', 'GET'])

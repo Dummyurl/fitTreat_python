@@ -56,12 +56,12 @@ class User(Document):
     unreadCount = IntField(default=0)
 
 
-def pre_save_func(sender,document):
-    document['password'] = str(flask_bcrypt.generate_password_hash(document['password']).decode('utf-8'))
-    dob = parser.parse(document['dateOfBirth'])
-    today = datetime.today()
-    age = relativedelta.relativedelta(today, dob)
-    document['age'] = age.years
+    def pre_save_func(cls, sender,document, **kwargs):
+        document['password'] = str(flask_bcrypt.generate_password_hash(document['password']).decode('utf-8'))
+        dob = parser.parse(document['dateOfBirth'])
+        today = datetime.today()
+        age = relativedelta.relativedelta(today, dob)
+        document['age'] = age.years
 
 
-pre_save.connect(pre_save_func)
+pre_save.connect(User.pre_save_func, sender=User)
