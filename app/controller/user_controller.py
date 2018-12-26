@@ -4,7 +4,6 @@ Created on 19-Dec-2018
 @author: Balkrishna.Meena
 '''
 
-from typing import Any, Union
 import bson
 from flask import request
 from flask.json import jsonify
@@ -20,11 +19,12 @@ def register():
     data = AttrDict(request.get_json())
     try:
         user = User.objects(email=data.email).get()
-        obj: Any = {}
-        obj['error'] = "Email already in use"
+        obj = {
+            'error': "Email already in use"
+        }
         return jsonify(obj)
     except DoesNotExist:
-        msg_content: str = "Dear " + data.firstName + ", <br><br> Welcome to FitTreat.<br><br> Team FitTreat"
+        msg_content = "Dear " + data.firstName + ", <br><br> Welcome to FitTreat.<br><br> Team FitTreat"
         user = User(
             firstName=data.firstName,
             lastName=data.lastName,
