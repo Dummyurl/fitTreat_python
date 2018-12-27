@@ -6,10 +6,36 @@ from app.models.symptoms import Symptom
 
 from attrdict import AttrDict
 from mongoengine import NotUniqueError
+from attrdict import AttrDict
+from flask_api import status
 
 
-def addMedicineData():
-    pass #todo check with Bala
+'''   /* Add Symptoms in bulk*/ '''
+
+
+def bulkSymptomsUpload():
+    symp_data = request.get_json()
+    for symp in symp_data:
+        medSearchArr = []
+        for med in symp['medicines']:
+            medSearchArr.append(med['name'])
+        try:
+            medicine = Medicine.objects(name__in=medSearchArr)
+            medArr = []
+            for medRef in medicine:
+                medArr.append(medRef)
+            try:
+                symptom = Symptom(name=symp['symptom']['name'], medicines=medArr,
+                                  indications=symp['indications'] if 'indications' in symp else None)
+                symptom.save()
+            except Exception as e:
+                print(e)
+                return format(e), status.HTTP_500_INTERNAL_SERVER_ERROR
+        except Exception as e:
+            print(e)
+            return 'Error Occurred : ' + format(e), status.HTTP_500_INTERNAL_SERVER_ERROR
+    return jsonify({'status':'Data inserted successfully'}), 200
+
 
 def first5Symptoms():
     return jsonify(Symptom.objects[:5])

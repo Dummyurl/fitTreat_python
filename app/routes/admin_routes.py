@@ -62,9 +62,12 @@ def deleteMeds():
     return medicine_controller.deleteMeds() #done
 
 
+'''   /* Add Symptoms in bulk*/ '''
+
+
 @app.route('/admin/addSymptoms', methods=['POST'])
 def addSymptoms():
-    return symptom_controller.addMedicineData()
+    return symptom_controller.bulkSymptomsUpload()
 
 
 @app.route('/admin/addNewSymptom', methods=['POST'])
