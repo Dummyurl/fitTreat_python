@@ -16,24 +16,24 @@ def addNewMeal():
     data = AttrDict(request.get_json())
     try:
         newMeal = Meal(
-            name=data.name, 
+            name=data.name,
             foodPreference=data.foodPreference,
-            cuisine=data.cuisine, 
+            cuisine=data.cuisine,
             dietType=[dt for dt in data.dietType],
-            idealMedCond=[imc for imc in data.idealMedCond], 
+            idealMedCond=[imc for imc in data.idealMedCond],
             avoidableMedCond=[amc for amc in data.avoidableMedCond],
-            course = data.course,
-            calories = data.calories,
-            nutritionInfo = data.nutritionInfo,
-            ingredients = data.ingredients,
-            directions = data.directions,
-            photoURL = Config.s3URL + data.photoURL
+            course=data.course,
+            calories=data.calories,
+            nutritionInfo=data.nutritionInfo,
+            ingredients=data.ingredients,
+            directions=data.directions,
+            photoURL=Config.s3URL + data.photoURL
         ).save()
         return jsonify(newMeal)
     except NotUniqueError:
-        return 'Meal already exists.'
+        return 'Meal already exists.', status.HTTP_400_BAD_REQUEST
     except Exception as e:
-        return 'Error while saving meal - {}'.format(e), status.HTTP_400_BAD_REQUEST
+        return 'Error while saving meal - {}'.format(e), status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
 ''' /* Add Meals in bulk '''
@@ -63,7 +63,7 @@ def addMealData():
             )
             queryList.append(newMeal)
     try:
-        meals = Meal.objects.insert(queryList,load_bulk=True)
+        meals = Meal.objects.insert(queryList, load_bulk=True)
         return jsonify(meals), status.HTTP_200_OK
     except Exception as e:
         print(e.with_traceback())
@@ -71,44 +71,46 @@ def addMealData():
 
 
 def getMeals():
-    pass #todo check with Bala
+    pass  # todo check with Bala
+
 
 def filterMeals():
-    pass #todo check with Bala
+    pass  # todo check with Bala
+
 
 def getMealsList():
     return jsonify(Meal.objects)
 
-def updateMeal(id):
+
+def updateMeal(meal_id):
     data = AttrDict(request.get_json())
 
     try:
-        updatedMeal = Meal.objects(id=id).update_one(
-            name=data.name, 
+        updatedMeal = Meal.objects(id=meal_id).update_one(
+            name=data.name,
             foodPreference=data.foodPreference,
-            cuisine=data.cuisine, 
+            cuisine=data.cuisine,
             dietType=[dt for dt in data.dietType],
-            idealMedCond=[imc for imc in data.idealMedCond], 
+            idealMedCond=[imc for imc in data.idealMedCond],
             avoidableMedCond=[amc for amc in data.avoidableMedCond],
-            course = data.course,
-            calories = data.calories,
-            nutritionInfo = data.nutritionInfo,
-            ingredients = data.ingredients,
-            directions = data.directions,
-            photoURL = data.photoURL
+            course=data.course,
+            calories=data.calories,
+            nutritionInfo=data.nutritionInfo,
+            ingredients=data.ingredients,
+            directions=data.directions,
+            photoURL=data.photoURL
         )
         return updatedMeal
     except Exception as e:
-        return 'Unable to update meal - {}'.format(e),status.HTTP_500_INTERNAL_SERVER_ERROR
-    
+        return 'Unable to update meal - {}'.format(e), status.HTTP_500_INTERNAL_SERVER_ERROR
 
-def deleteMeal(id):
+
+def deleteMeal(meal_id):
     try:
-        delMeal = Meal.objects(id=id)
-        if delMeal:
-            delMeal = delMeal.delete()
-            return jsonify(delMeal)
-        else:
-            return 'Meals not deleted', status.HTTP_400_BAD_REQUEST
+        delMeal = Meal.objects(id=meal_id).get()
+        delMeal.delete()
+        return jsonify({'status':'Meal deleted successfully'}), status.HTTP_200_OK
+    except DoesNotExist as dne:
+        return 'Meal not found - {}'.format(dne.with_traceback), status.HTTP_400_BAD_REQUEST
     except Exception as e:
-        return 'Unable to delete meals - {}'.format(e), status.HTTP_500_INTERNAL_SERVER_ERROR
+        return format(e.with_traceback()), status.HTTP_500_INTERNAL_SERVER_ERROR

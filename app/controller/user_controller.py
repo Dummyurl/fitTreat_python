@@ -11,7 +11,6 @@ from app.models.user import User, Messages
 from attrdict import AttrDict
 from mongoengine import DoesNotExist
 
-
 '''    /*** New Registration ***/ '''
 
 
@@ -68,14 +67,14 @@ def activeUser(user_id):
 ''' /*** Updates message read/unread status ***/ '''
 
 
-def messageReadStatusChange(user_id,msg_id):
+def messageReadStatusChange(user_id, msg_id):
     try:
         user = User.objects.get(id=bson.objectid.ObjectId(str(user_id)))
         # message = [msg for msg in user['messages']]
         for msg in user['messages']:
-            if(str(msg['_id']) == msg_id):
+            if str(msg['_id']) == msg_id:
                 print('Message Found')
-                msg['readFlag'] =  not (msg['readFlag'])
+                msg['readFlag'] = not (msg['readFlag'])
                 try:
                     msg.save()
                     return jsonify(msg)

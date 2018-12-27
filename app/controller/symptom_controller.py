@@ -2,7 +2,7 @@ from attrdict import AttrDict
 from flask import request
 from flask.json import jsonify
 from flask_api import status
-from mongoengine.errors import NotUniqueError,DoesNotExist
+from mongoengine.errors import NotUniqueError, DoesNotExist
 
 from app.models.medicines import Medicine
 from app.models.symptoms import Symptom
@@ -31,11 +31,11 @@ def bulkSymptomsUpload():
                     symptom.save()
                 except Exception as e:
                     print(e.with_traceback())
-                    return format(e.with_traceback()),status.HTTP_500_INTERNAL_SERVER_ERROR
+                    return format(e.with_traceback()), status.HTTP_500_INTERNAL_SERVER_ERROR
         except Exception as e:
             print(e)
             return 'Error Occurred : ' + format(e), status.HTTP_500_INTERNAL_SERVER_ERROR
-    return jsonify({'status':'Data inserted successfully'}), 200
+    return jsonify({'status': 'Data inserted successfully'}), 200
 
 
 ''' Initial Symptoms'''

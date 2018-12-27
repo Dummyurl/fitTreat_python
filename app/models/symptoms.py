@@ -10,6 +10,6 @@ from app.models.medicines import Medicine
 
 
 class Symptom(Document):
-    name= StringField(required=True, unique=True)
-    indications=StringField()
-    medicines=ListField(ReferenceField(Medicine))
+    name = StringField(required=True, unique=True)
+    indications = StringField()
+    medicines = ListField(ReferenceField(Medicine))
