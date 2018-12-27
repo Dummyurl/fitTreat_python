@@ -17,6 +17,9 @@ def editAppData(id):
     return appData_controller.setAppDefaultData(id) #done
 
 
+'''  /* Add Meals in bulk */ '''
+
+
 @app.route('/admin/addMeals', methods=['POST'])
 def addMeals():
     return meal_controller.addMealData()

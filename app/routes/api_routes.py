@@ -63,9 +63,15 @@ def filterMeals(type, foodPref, userId):
     pass
 
 
+''' /* Initial Symptoms */ '''
+
+
 @app.route('/api/initialSymptoms')
 def initialSymptoms():
     return symptom_controller.first5Symptoms() #done
+
+
+''' /* Search Symptom */ '''
 
 
 @app.route('/api/searchSymptoms/<searchParam>')

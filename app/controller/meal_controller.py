@@ -3,16 +3,17 @@ from flask.json import jsonify
 
 from app.models.meal import Meal
 from app.models.user import User
-from attrdict import  AttrDict
-
+from attrdict import AttrDict
+from mongoengine.errors import DoesNotExist
+from mongoengine.queryset import QuerySet
 from config import Config
+from flask_api import status
 
 from mongoengine import NotUniqueError
 
 
 def addNewMeal():
     data = AttrDict(request.get_json())
-
     try:
         newMeal = Meal(
             name=data.name, 
@@ -26,17 +27,48 @@ def addNewMeal():
             nutritionInfo = data.nutritionInfo,
             ingredients = data.ingredients,
             directions = data.directions,
-            photoURL = data.photoURL
+            photoURL = Config.s3URL + data.photoURL
         ).save()
-
         return jsonify(newMeal)
     except NotUniqueError:
         return 'Meal already exists.'
     except Exception as e:
-        return 'Error while saving meal - {}'.format(e), 400
+        return 'Error while saving meal - {}'.format(e), status.HTTP_400_BAD_REQUEST
+
+
+''' /* Add Meals in bulk '''
+
 
 def addMealData():
-    pass #todo check with Bala
+    meals_array = request.get_json()
+    queryList = []
+    for meal in meals_array:
+        try:
+            meal = Meal.objects.get(name=meal['name'])
+        except DoesNotExist as dne:
+            data = AttrDict(meal)
+            newMeal = Meal(
+                name=data.name,
+                foodPreference=data.foodPreference,
+                cuisine=data.cuisine,
+                dietType=[dt for dt in data.dietType],
+                idealMedCond=[imc for imc in data.idealMedCond],
+                avoidableMedCond=[amc for amc in data.avoidableMedCond],
+                course=data.course,
+                calories=data.calories,
+                nutritionInfo=data.nutritionInfo,
+                ingredients=data.ingredients,
+                directions=data.directions,
+                photoURL=Config.s3URL + data.photoURL
+            )
+            queryList.append(newMeal)
+    try:
+        meals = Meal.objects.insert(queryList,load_bulk=True)
+        return jsonify(meals), status.HTTP_200_OK
+    except Exception as e:
+        print(e.with_traceback())
+        return format(e.with_traceback()), status.HTTP_400_BAD_REQUEST
+
 
 def getMeals():
     pass #todo check with Bala
@@ -65,10 +97,9 @@ def updateMeal(id):
             directions = data.directions,
             photoURL = data.photoURL
         )
-
         return updatedMeal
     except Exception as e:
-        return 'Unable to update meal - {}'.format(e)
+        return 'Unable to update meal - {}'.format(e),status.HTTP_500_INTERNAL_SERVER_ERROR
     
 
 def deleteMeal(id):
@@ -78,10 +109,6 @@ def deleteMeal(id):
             delMeal = delMeal.delete()
             return jsonify(delMeal)
         else:
-            return 'Meals not deleted', 400
+            return 'Meals not deleted', status.HTTP_400_BAD_REQUEST
     except Exception as e:
-        return 'Unable to delete meals - {}'.format(e)
-
-
-def implicitEndTest():
-    pass #todo check with Bala
+        return 'Unable to delete meals - {}'.format(e), status.HTTP_500_INTERNAL_SERVER_ERROR
