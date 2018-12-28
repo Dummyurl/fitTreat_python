@@ -68,7 +68,7 @@ def getUsers():
 
 @app.route('/updateUser/<email>/<fname>/<lname>')
 def updateUser(email, fname, lname):
-    r = User.objects(email=email).update_one(firstName=fname, lastName=lname)
+    r = User.objects(email=email).get().update_one(firstName=fname, lastName=lname)
     print(r)
 
     return 'User updated. Check DB'

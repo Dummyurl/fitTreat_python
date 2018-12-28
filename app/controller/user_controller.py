@@ -5,11 +5,18 @@ Created on 19-Dec-2018
 '''
 
 import bson
-from flask import request
+from flask import request, render_template
 from flask.json import jsonify
+from app import app
 from app.models.user import User, Messages
 from attrdict import AttrDict
+from datetime import datetime, timedelta
 from mongoengine import DoesNotExist
+from cryptography.fernet import Fernet
+from config import Config
+
+import smtplib
+from email.mime.text import MIMEText
 
 '''    /*** New Registration ***/ '''
 
@@ -83,3 +90,118 @@ def messageReadStatusChange(user_id, msg_id):
                     return 'Error in saving message status'
     except Exception as e:
         return 'Some error occurred : ' + str(e)
+
+
+def updateGoalWeight():
+    body = AttrDict(request.get_json())
+    try:
+        User.objects(id=body.id).update_one(targetWeight=body.targetWeight, \
+            targetDate=body.targetDate, targetCalories=body.targetCalories, \
+            weightUnit=body.weightUnit)
+
+        return jsonify({'msg': 'success'})
+    except DoesNotExist:
+        return 'No such user found', 500
+
+
+def reloadMessages(id):
+    try:
+        user = User.objects(id=id).get()
+
+        return jsonify({
+            'msgSummary': user.unreadCount,
+            'messages': user.messages
+        })
+    except DoesNotExist:
+        return 'No such user found', 400
+
+
+def updateProfile():
+    body = AttrDict(request.get_json())
+
+    User.objects(id=body.id).update_one(\
+        weight = body.weight,
+        weightUnit = body.weightUnit,
+        height = body.height,
+        heightUnit = body.heightUnit,
+        foodPreference = body.foodPreference,
+        medicalCondition = body.medicalCondition,
+        firstName = body.firstName,
+        lastName = body.lastName
+    )
+
+    return activeUser(body.id)
+
+
+def changePassword(email):
+    try:
+        user = User.objects(email=email).get()
+        print(user)
+
+        userId = user.id
+        fern = Fernet(Config.crptrKey)
+        resetToken = fern.encrypt('{}r353tT0k3n'.format(userId).encode()).decode('utf-8')
+        resetExpiryTime = datetime.now() + timedelta(minutes=30)
+        
+        User.objects(id=userId)\
+            .update_one(resetPasswordToken=resetToken, resetPasswordExpires=resetExpiryTime)
+        
+        userName = user.firstName
+        link = "http://localhost:8888/api/passwordResetRedirect/?token=" + resetToken + "&id=" + str(userId)
+
+        #return render_template('changePassword.html', username=userName, link=link)
+
+        msg = MIMEText(render_template('changePassword.html', username=userName, link=link), 'html')
+        msg['Subject'] = 'FitTreat : Password Reset'
+        msg['From'] = 'FitTreat app116066240@heroku.com'
+        msg['To'] = email
+
+        try:
+            s = smtplib.SMTP('smtp.gmail.com', 587)
+            s.ehlo()
+            s.starttls()
+            s.login('consult.saurabh@gmail.com', 'Welcome$000')
+            s.sendmail('consult.saurabh@gmail.com', [email], msg.as_string())
+            s.close()
+            print('mail sent')
+            return {'msg': 'Please check your registered email'}, 200
+        except Exception as e:
+            print('error while sending mail')
+            print(e)
+            return {'msg': 'Some error occurred.'}, 400
+    except DoesNotExist:
+        return 'No user found with email - {}'.format(email), 404
+
+
+def resetPassword():
+    try:
+        body = AttrDict(request.get_json())
+        
+        token = body.token
+        dob = body.dob
+        password = body.password
+
+        fern = Fernet(Config.crptrKey)
+        decryptToken = fern.decrypt(token.encode()).decode()
+        
+        userId = decryptToken[0:decryptToken.index("r353tT0k3n")]
+
+        print(userId)
+
+        try:
+            user = User.objects(id=userId).get()
+
+            if datetime.now() < user.resetPasswordExpires:
+                if user.dateOfBirth == dob:
+                    User.objects(id=userId).update_one(password=password, resetPasswordExpires=datetime.now())
+                    return app.send_static_file('passwordReset/passwordChangeSuccess.html')
+                else:
+                    return jsonify({'msg': 'DOB did not match'}), 500
+            else:
+                return app.send_static_file('passwordReset/passwordLinkExpired.html')
+            
+        except DoesNotExist:
+            return 'No such user found', 400
+    except Exception as e:
+        print(e)
+        return 'Something wrong happened', 500

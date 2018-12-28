@@ -12,7 +12,7 @@ def loggedInUser(user_id):
 
 @app.route('/api/changePassword/<email>')
 def changePassword(email):
-    pass
+    return user_controller.changePassword(email) #done
 
 
 @app.route('/api/passwordResetRedirect')
@@ -22,7 +22,7 @@ def passwordResetRedirect():
 
 @app.route('/api/resetPassword', methods=['POST'])
 def resetPassword():
-    pass
+    return user_controller.resetPassword() #done
 
 
 ''' /*** Change status of message to read/unread ***/ ''' # done
@@ -35,17 +35,17 @@ def readMessage(user_id, msg_id):
 
 @app.route('/api/targetWeight', methods=['PUT'])
 def targetWeight():
-    pass
+    return user_controller.updateGoalWeight() #done
 
 
 @app.route('/api/reloadMessages/<id>')
 def reloadMessages(id):
-    pass
+    return user_controller.reloadMessages(id) #done
 
 
 @app.route('/api/updateProfile', methods=['PUT'])
 def updateProfile():
-    pass
+    return user_controller.updateProfile() #done
 
 
 @app.route('/api/photoUpdate', methods=['POST'])
