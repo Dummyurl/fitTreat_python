@@ -158,7 +158,7 @@ def changePassword(email):
             .update_one(resetPasswordToken=resetToken, resetPasswordExpires=resetExpiryTime)
         
         userName = user.firstName
-        link = "http://localhost:8888/api/passwordResetRedirect?token=" + resetToken + "&id=" + str(userId)
+        link = "http://" + Config.uri + "/api/passwordResetRedirect?token=" + resetToken + "&id=" + str(userId)
 
         #return render_template('changePassword.html', username=userName, link=link)
 
@@ -175,11 +175,11 @@ def changePassword(email):
             s.sendmail('consult.saurabh@gmail.com', [email], msg.as_string())
             s.close()
             print('mail sent')
-            return {'msg': 'Please check your registered email'}, 200
+            return jsonify({'msg': 'Please check your registered email'}), 200
         except Exception as e:
             print('error while sending mail')
             print(e)
-            return {'msg': 'Some error occurred.'}, 400
+            return jsonify({'msg': 'Some error occurred.'}), 400
     except DoesNotExist:
         return 'No user found with email - {}'.format(email), 404
 

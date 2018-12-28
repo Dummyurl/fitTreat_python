@@ -15,6 +15,7 @@ class Config(object):
     userId = 'app116066240@heroku.com'
     password = 'Welcome12#'
     dbName = 'fitdb'
+    uri = env.uris[0] or 'localhost:8888'
     MONGODB_SETTINGS = {
         'db': dbName,
         'host': 'mongodb://conusr:Welcome1@ds113454.mlab.com/' + dbName,
