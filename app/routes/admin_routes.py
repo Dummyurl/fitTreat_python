@@ -11,121 +11,91 @@ import bson
 from app import app, mdb
 from app.controller import appData_controller, meal_controller, medicine_controller, symptom_controller
 
-''' /* Edit App Data  */ '''
-
-
+''' /* Edit App Data  */ ''' #done
 @app.route('/admin/editAppData/<id>', methods=['PUT'])
 def editAppData(id):
-    return appData_controller.setAppDefaultData(id)  # done
+    return appData_controller.setAppDefaultData(id)
 
 
-'''  /* Add Meals in bulk */ '''
-
-
+'''  /* Add Meals in bulk */ ''' #done
 @app.route('/admin/addMeals', methods=['POST'])
 def addMeals():
-    return meal_controller.addMealData()  # done
+    return meal_controller.addMealData()
 
 
-'''  /* Add New Meal */ '''
-
-
+'''  /* Add New Meal */ ''' #done
 @app.route('/admin/addNewMeal', methods=['POST'])
 def addNewMeal():
-    return meal_controller.addNewMeal()  # done
+    return meal_controller.addNewMeal()
 
 
-''' /* Update Meal  */ '''
-
-
+''' /* Update Meal  */ ''' #done
 @app.route('/admin/updateMeal/<id>', methods=['PUT'])
 def updateMeal(meal_id):
-    return meal_controller.updateMeal(meal_id)  # done
+    return meal_controller.updateMeal(meal_id)
 
 
-''' /* Remove Meal */ '''
-
-
+''' /* Remove Meal */ ''' #done
 @app.route('/admin/deleteMeal/<meal_id>', methods=['DELETE'])
 def deleteMeal(meal_id):
-    return meal_controller.deleteMeal(meal_id)  # done
+    return meal_controller.deleteMeal(meal_id)
 
 
-''' /* Get Meals List */ '''
-
-
+''' /* Get Meals List */ ''' #done
 @app.route('/admin/getMealsList')
 def getMealsList():
-    return meal_controller.getMealsList()  # done
+    return meal_controller.getMealsList()
 
 
-'''  /* Add Medicines in bulk */ '''
-
-
+'''  /* Add Medicines in bulk */ ''' #done
 @app.route('/admin/addMedicines', methods=['POST'])
 def addMedicines():
-    return medicine_controller.addMedicines()  # done
+    return medicine_controller.addMedicines()
 
 
-''' /* Add New Medicine */ '''
-
-
+''' /* Add New Medicine */ ''' #done
 @app.route('/admin/addNewMedicine', methods=['POST'])
 def addNewMedicine():
-    return medicine_controller.addNewMedicine()  # done
+    return medicine_controller.addNewMedicine()
 
 
-''' /* Query all medicines */ '''
-
-
+''' /* Query all medicines */ ''' #done
 @app.route('/admin/getAllMeds')
 def getAllMeds():
-    return medicine_controller.getAllMedicines()  # done
+    return medicine_controller.getAllMedicines()
 
 
-''' /* Delete Medicines */'''
-
-
+''' /* Delete Medicines */''' #done
 @app.route('/admin/deleteMeds', methods=['POST'])
 def deleteMeds():
-    return medicine_controller.deleteMeds()  # done
+    return medicine_controller.deleteMeds()
 
 
-'''   /* Add Symptoms in bulk*/ '''
-
-
+'''   /* Add Symptoms in bulk*/ ''' #done
 @app.route('/admin/addSymptoms', methods=['POST'])
 def addSymptoms():
-    return symptom_controller.bulkSymptomsUpload()  # done
+    return symptom_controller.bulkSymptomsUpload()
 
 
-''' /* Add new Symptom */ '''
-
-
+''' /* Add new Symptom */ ''' #done
 @app.route('/admin/addNewSymptom', methods=['POST'])
 def addNewSymptom():
-    return symptom_controller.addNewSymptom()  # done
+    return symptom_controller.addNewSymptom()
 
 
-''' /* Get All Symptoms */ '''
-
-
+''' /* Get All Symptoms */ ''' #done
 @app.route('/admin/getAllSymptoms')
 def getAllSymptoms():
-    return symptom_controller.getAllSymptoms()  # done
+    return symptom_controller.getAllSymptoms()
 
 
-'''  /* Delete Symptoms */ '''
-
-
+'''  /* Delete Symptoms */ ''' #done
 @app.route('/admin/deleteSymptopms', methods=['POST'])
 def deleteSymptopms():
-    return symptom_controller.deleteSymptoms()  # done
+    return symptom_controller.deleteSymptoms()
 
 
-''' /* Database Statistics */ '''
-
-
+''' /* Database Statistics */ ''' #done
 @app.route('/admin/dbStats')
 def dbStats():
     obj = {
@@ -134,12 +104,10 @@ def dbStats():
         'medicines': Medicine.objects.count(),
         'symptoms': Symptom.objects.count()
     }
-    return jsonify(obj), 200  # done
+    return jsonify(obj), 200
 
 
-''' /* Bulk upload templates download */ '''
-
-
+''' /* Bulk upload templates download */ ''' #done
 @app.route('/admin/templateDownload/<name>')
 def templateDownload(name):
     filePath = {
@@ -147,12 +115,10 @@ def templateDownload(name):
         'medicine': 'medicineData.json',
         'symptoms': 'SymptomsData.json'
     }
-    return app.send_static_file(filePath[name])  # done
+    return app.send_static_file(filePath[name])
 
 
-'''  /* Drop collections service */ '''
-
-
+'''  /* Drop collections service */ ''' #done
 @app.route('/admin/deleteCollection/<name>', methods=['DELETE'])
 def deleteCollection(name):
     if name == 'users':
@@ -171,23 +137,19 @@ def deleteCollection(name):
         print('Wrong collection name provided: {}'.format(name))
         return 'Wrong collection name provided: {}'.format(name), 400
 
-    return '{} collection deleted'.format(name), 200  # done
+    return '{} collection deleted'.format(name), 200
 
 
-'''  /* Clear DB */ '''
-
-
+'''  /* Clear DB */ ''' #done
 @app.route('/admin/clearDB')
 def clearDB():
     db = _get_db()
     conn = _get_connection()
     conn.drop_database(db)
-    return 'DB {} cleared'.format(db.name), 200  # done
+    return 'DB {} cleared'.format(db.name), 200
 
 
-''' /*** Send Message to a user ***/ '''  # done
-
-
+''' /*** Send Message to a user ***/ '''  #done
 @app.route('/admin/sendMsgToUser', methods=['POST'])
 def sendMsgToUser():
     msg_data = AttrDict(request.get_json())

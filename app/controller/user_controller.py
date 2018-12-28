@@ -132,6 +132,17 @@ def updateProfile():
 
     return activeUser(body.id)
 
+def userPhotoUpdate():
+    body = AttrDict(request.get_json())
+
+    try:
+        upd = User.objects(id=body.id).update_one(userPhoto=body.userPhoto)
+        if upd:
+            return jsonify({ 'id':body.id, 'photoString':body.userPhoto })
+        else:
+            return 'Cannot update profile photo', 500
+    except DoesNotExist:
+        return 'No such user found', 400
 
 def changePassword(email):
     try:
@@ -147,7 +158,7 @@ def changePassword(email):
             .update_one(resetPasswordToken=resetToken, resetPasswordExpires=resetExpiryTime)
         
         userName = user.firstName
-        link = "http://localhost:8888/api/passwordResetRedirect/?token=" + resetToken + "&id=" + str(userId)
+        link = "http://localhost:8888/api/passwordResetRedirect?token=" + resetToken + "&id=" + str(userId)
 
         #return render_template('changePassword.html', username=userName, link=link)
 

@@ -17,17 +17,13 @@ def test():
          return 'Password Mis-match'
 
 
-''' /*** User Registration ***/ '''
-
-
+''' /*** User Registration ***/ ''' #done
 @app.route('/auth/register', methods=['POST'])
 def register():
     return user_controller.register()
 
 
-''' /*** User Login ***/ '''
-
-
+''' /*** User Login ***/ ''' #done
 @app.route('/auth/login', methods=['POST'])
 def login():
     email_id = request.get_json()['email']
