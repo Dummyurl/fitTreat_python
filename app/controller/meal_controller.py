@@ -8,7 +8,7 @@ from mongoengine.errors import DoesNotExist
 from mongoengine.queryset import QuerySet
 from config import Config
 from flask_api import status
-from dateutil import tz
+from dateutil import tz,utils
 from datetime import datetime, timedelta
 
 from mongoengine import NotUniqueError
@@ -89,21 +89,25 @@ def getMeals(userId):
     try:
         user = User.objects(id=userId).get()
         newMealsFlag = False
+        assignedMealIds = []
+        if user['mealAssigned']:
+            for meal in user['mealAssigned']:
+                assignedMealIds.append(meal['id'])
         if user and user['mealExpiry']:
             ''' Check for meal plan expiry'''
             tzinf = tz.tz.tzoffset('TZONE', int(user['timeZone'])/1000)  # creating the user's timezone by
-                                                                        # timezone offset
-            localCurrentTime = datetime.now(tz=tzinf)  # creating local time
+            localCurrentTime = utils.default_tzinfo(datetime.now(),tzinf) #datetime.now(tz=tzinf)  # creating local time
 
             # Check if meal plan has expired
-            if localCurrentTime > user['mealExpiry']:
+            if localCurrentTime > utils.default_tzinfo(user['mealExpiry'],tzinf):
                 newMealsFlag = True
             else:
                 try:
-                    meals = Meal.objects(id__in=user['mealAssigned'])
+                    meals = Meal.objects(id__in=assignedMealIds)
+                    return jsonify(meals),status.HTTP_200_OK
                 except Exception as e:
-                    print(format(e))
-                    return jsonify({'stat':'Some error occurred'}),500
+                    print('Error while getting meals ' + format(e))
+                    return jsonify({'stat':'Some error occurred'}), status.HTTP_500_INTERNAL_SERVER_ERROR
         else:
             newMealsFlag = True
         if newMealsFlag:
@@ -113,9 +117,9 @@ def getMeals(userId):
             foodPref = []
             vegLimit = 15
             nonVegLimit = 0
-            if user['foodPreference'] is 'Vegan':
+            if user['foodPreference'] == 'Vegan':
                 foodPref = ['Vegan']
-            elif user['foodPreference'] is 'Vegetarian':
+            elif user['foodPreference'] == 'Vegetarian':
                 foodPref = ['Vegan','Vegetarian']
             else:
                 foodPref = ['Vegan','Vegetarian']
@@ -123,30 +127,91 @@ def getMeals(userId):
                 nonVegLimit = 10
 
             # Query Array Initialize
-            vegQuery = Meal.objects(id__nin=user['mealAssigned'],foodPreference__in=foodPref,
-                                    avoidableMedCond__nin=usersMedicalCondition)[:vegLimit]
-            if user['foodPreference'] == 'Non-Vegetarian':
-                nonVegQuery = Meal.objects(id__nin=user['mealAssigned'],foodPreference__in=['Non-Vegetarian'],
-                                           avoidableMedCond__nin=usersMedicalCondition)[:nonVegLimit]
-                res = (list(vegQuery) + list(nonVegQuery))
-            else:
-                res = vegQuery
-
+            try:
+                for obj in user['mealAssigned']:
+                    print(obj)
+                vegQuery = Meal.objects(id__nin=assignedMealIds,foodPreference__in=foodPref,
+                                        avoidableMedCond__nin=usersMedicalCondition)[:vegLimit]
+                if user['foodPreference'] == 'Non-Vegetarian':
+                    nonVegQuery = Meal.objects(id__nin=assignedMealIds,foodPreference__in=['Non-Vegetarian'],
+                                               avoidableMedCond__nin=usersMedicalCondition)[:nonVegLimit]
+                    res = list(vegQuery) + list(nonVegQuery)
+                else:
+                    res = vegQuery
+            except Exception as dbe:
+                print('Error while querying meals : ' + format(dbe))
+                return jsonify({'error':format(dbe)}),status.HTTP_500_INTERNAL_SERVER_ERROR
             ''' Assigning generated plan to the user '''
             tzinf = tz.tz.tzoffset('TZONE', int(user['timeZone'])/1000)
-            localCurrentTime = datetime.now(tz=tzinf)
+            localCurrentTime = utils.default_tzinfo(datetime.now(),tzinf) # datetime.now(tz=tzinf)
             expiryTime = localCurrentTime + timedelta(days=1)
-            user['mealExpiry'] = expiryTime.replace(hour=5, minute=0, second=0, microsecond=0, tzinfo=tzinf)
+            user['mealExpiry'] = utils.default_tzinfo(expiryTime.replace(hour=5, minute=0, second=0, microsecond=0),tzinf)
             user['mealAssigned'] = res
         user.save()
         return jsonify(user['mealAssigned']),200
     except Exception as e:
         return format(e),500
 
+'''
+    Service to filter meals
 
+    -Consider user's medical condition
+'''
 
-def filterMeals():
-    pass  # todo check with Bala
+def filterMeals(type, foodPref, userId):
+    try:
+        user = User.objects(id=userId).get()
+        usersMedicalCondition = user['medicalCondition']
+        srchArr = [];
+        exstMealSrchFlag = False
+        if type == 'Snacks':
+            srchArr = ['Snack']
+            print(type)
+        elif type == 'Breakfast':
+            srchArr = ['Breakfast']
+            exstMealSrchFlag = True
+        elif type == 'Lunch':
+            srchArr = ['Lunch']
+            exstMealSrchFlag = True
+        elif type == 'Dinner':
+            srchArr = ['Dinner']
+            exstMealSrchFlag = True
+        else:
+            srchArr = ['Soup','Juice']
+
+        vegLimit = 10;
+        nonVegLimit = 0;
+        if foodPref == 'Vegan':
+            foodPref =['Vegan']
+        elif foodPref == 'Vegetarian':
+            foodPref = ['Vegan', 'Vegetarian']
+        else:
+            foodPref =['Vegan', 'Vegetarian']
+            vegLimit = 5
+            nonVegLimit = 5
+        if exstMealSrchFlag:
+            res = []
+            mealAssigned = [meal['id'] for meal in user['mealAssigned']]
+            vegQuery = Meal.objects(id__in=mealAssigned,foodPreference__in=foodPref,course__in=srchArr)
+            if foodPref == 'Non-Vegetarian':
+                nonVegQuery = Meal.objects(id__in=mealAssigned,foodPref__in=['Non-Vegetarian'],course__in=srchArr)
+                res = list(vegQuery) + list(nonVegQuery)
+            else:
+                res = list(vegQuery)
+            return jsonify(res),status.HTTP_200_OK
+        else:
+            vegQuery = Meal.objects(foodPreference__in=foodPref, course__in=srchArr,
+                                    avoidableMedCond__nin=usersMedicalCondition)[:vegLimit]
+            if foodPref == 'Non-Vegetarian':
+                nonVegQuery = Meal.objects(foodPreference__in=['Non-Vegetarian'], course__in=srchArr,
+                                        avoidableMedCond__nin=usersMedicalCondition)[:nonVegLimit]
+                res = list(vegQuery) + list(nonVegQuery)
+            else:
+                res = vegQuery
+            return jsonify(res), status.HTTP_200_OK
+    except Exception as e:
+        print('Error occurred while filtering : ' + format(e))
+        return jsonify({'error':format(e)}), status.HTTP_400_BAD_REQUEST
 
 
 def getMealsList():

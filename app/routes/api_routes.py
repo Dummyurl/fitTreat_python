@@ -89,31 +89,31 @@ def photoUpdate():
 ''' /*** Get meals assigned to user ***/ '''
 @app.route('/api/getMeals/<userId>')
 def getMeals(userId):
-    return meal_controller.getMeals(userId)
+    return meal_controller.getMeals(userId)  # done
 
 
 ''' /*** Filter meals ***/ '''
 @app.route('/api/filterMeals/<type>/<foodPref>/<userId>')
 def filterMeals(type, foodPref, userId):
-    pass
+    return meal_controller.filterMeals(type, foodPref, userId)
 
 
-''' /* Initial Symptoms */ ''' #done
+''' /* Initial Symptoms */ '''
 @app.route('/api/initialSymptoms')
 def initialSymptoms():
-    return symptom_controller.first5Symptoms()
+    return symptom_controller.first5Symptoms() # done
 
 
-''' /* Search Symptom */ ''' #done
+''' /* Search Symptom */ '''
 @app.route('/api/searchSymptoms/<searchParam>')
 def searchSymptoms(searchParam):
-    return symptom_controller.searchSymptom(searchParam=searchParam)
+    return symptom_controller.searchSymptom(searchParam=searchParam) # done
 
 
-''' /*** Get app data ***/ ''' #done
+''' /*** Get app data ***/ '''
 @app.route('/api/getAppData')
 def getAppData():
-    return appData_controller.getAppDefaultData()
+    return appData_controller.getAppDefaultData()  # done
 
 
 ''' /*** Send message to admin ***/ ''' #done
