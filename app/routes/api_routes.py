@@ -1,6 +1,6 @@
 from flask import render_template, redirect, url_for, jsonify, request
 from app import app
-from app.controller import user_controller, appData_controller, symptom_controller
+from app.controller import user_controller, appData_controller, symptom_controller, meal_controller
 from app.models.user import User
 from mongoengine import DoesNotExist
 from datetime import datetime, timedelta
@@ -89,7 +89,7 @@ def photoUpdate():
 ''' /*** Get meals assigned to user ***/ '''
 @app.route('/api/getMeals/<userId>')
 def getMeals(userId):
-    pass
+    return meal_controller.getMeals(userId)
 
 
 ''' /*** Filter meals ***/ '''

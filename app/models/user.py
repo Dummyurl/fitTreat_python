@@ -42,7 +42,7 @@ class User(Document):
     height = IntField(required=True, default=0)
     heightUnit = BaseField(required=True, default='cm', choices=['cm', 'm', 'ft'])
     foodPreference = BaseField(required=True, default='Vegetarian', choices=['Vegan', 'Vegetarian', 'Non-Vegetarian'])
-    timeZone = StringField(default='UTC')
+    timeZone = StringField(default='0')  # Timezone Offset Value
     bmi = IntField(default=0)
     medicalCondition = StringField()
     targetWeight = IntField(default=0)
@@ -52,7 +52,7 @@ class User(Document):
     userPhoto = StringField()
     messages = ListField(EmbeddedDocumentField(Messages))
     mealAssigned = ListField(ReferenceField(Meal))
-    mealExpiry = IntField(default=0)
+    mealExpiry = DateTimeField()
     unreadCount = IntField(default=0)
 
     @staticmethod
