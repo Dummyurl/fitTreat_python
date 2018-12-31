@@ -5,6 +5,7 @@ from attrdict import AttrDict
 from mongoengine import NotUniqueError
 
 from app.models.medicines import Medicine
+from flask_api import status
 
 
 def addMedicines():
@@ -12,36 +13,33 @@ def addMedicines():
     meds = Medicine.objects.insert([Medicine(name=med['name'], dosage=med['dosage'] if 'dosage' in med else None,
                                              instructions=med['instructions'] if 'instructions' in med else None,
                                              ingredients=[ing for ing in med['ingredients']]) for med in data])
-    return jsonify(meds)
+    return jsonify(meds), status.HTTP_200_OK
 
 
 def getAllMedicines():
-    return jsonify(Medicine.objects)
+    return jsonify(Medicine.objects), status.HTTP_200_OK
 
 
 def deleteMeds():
     idArr = request.get_json()
-
     try:
         delMeds = Medicine.objects(id__in=idArr)
-
         if delMeds:
             delMeds = delMeds.delete()
             return jsonify(delMeds)
         else:
-            return 'Medicines not deleted', 400
+            return jsonify({'stat': 'Medicines not deleted'}), status.HTTP_500_INTERNAL_SERVER_ERROR
     except Exception as e:
-        return 'Unable to delete medicines - {}'.format(e)
+        return jsonify({'Error': format(e)}), status.HTTP_404_NOT_FOUND
 
 
 def addNewMedicine():
     data = AttrDict(request.get_json())
-
     try:
         newMed = Medicine(name=data.name, dosage=data.dosage, \
                           instructions=data.instructions, ingredients=[ing for ing in data.ingredients]).save()
-        return jsonify(newMed)
+        return jsonify(newMed), status.HTTP_200_OK
     except NotUniqueError:
-        return 'Medicine already exists.'
+        return jsonify({'stat': 'Medicine already exists.'}), status.HTTP_200_OK
     except Exception as e:
-        return 'Error while saving medicine', 400
+        return jsonify({'Error': format(e)}), status.HTTP_400_BAD_REQUEST

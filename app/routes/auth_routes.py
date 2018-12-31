@@ -4,39 +4,44 @@ from app.controller import user_controller
 import flask_bcrypt
 from app.models.user import User
 from mongoengine.errors import DoesNotExist
+from flask_api import status
 
 
 @app.route('/auth/test')
 def test():
     str = 'Balkrishna'
-    generated = flask_bcrypt.generate_password_hash(str,5)
+    generated = flask_bcrypt.generate_password_hash(str, 5)
     print(generated)
-    if flask_bcrypt.check_password_hash(generated,'Balkrishna1'):
-         return 'Password Match'
+    if flask_bcrypt.check_password_hash(generated, 'Balkrishna1'):
+        return 'Password Match'
     else:
-         return 'Password Mis-match'
+        return 'Password Mis-match'
 
 
-''' /*** User Registration ***/ ''' #done
+''' /*** User Registration ***/ '''  # done
+
+
 @app.route('/auth/register', methods=['POST'])
 def register():
-    return user_controller.register()
+    return user_controller.register(), status.HTTP_200_OK
 
 
-''' /*** User Login ***/ ''' #done
+''' /*** User Login ***/ '''  # done
+
+
 @app.route('/auth/login', methods=['POST'])
 def login():
     email_id = request.get_json()['email']
     password = request.get_json()['password']
     try:
         user = User.objects(email=email_id).get()
-        if flask_bcrypt.check_password_hash(user['password'],password):
+        if flask_bcrypt.check_password_hash(user['password'], password):
             user['password'] = None
             user['mealAssigned'] = None
             unreadMsg = [msg for msg in user['messages'] if msg['readFlag'] is False]
             user['unreadCount'] = len(unreadMsg)
-            return jsonify(user), 200
+            return jsonify(user), status.HTTP_200_OK
         else:
-            return jsonify({'error': 'Invalid Credentials'}), 401
+            return jsonify({'error': 'Invalid Credentials'}), status.HTTP_401_UNAUTHORIZED
     except DoesNotExist:
-        return jsonify({'error':'User does not exist'}), 401
+        return jsonify({'error': 'User does not exist'}), status.HTTP_401_UNAUTHORIZED

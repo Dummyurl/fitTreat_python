@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 from mongoengine import DoesNotExist
 from cryptography.fernet import Fernet
 from config import Config
+from flask_api import status
 
 import smtplib
 from email.mime.text import MIMEText
@@ -28,7 +29,7 @@ def register():
         obj = {
             'error': "Email already in use"
         }
-        return jsonify(obj)
+        return jsonify(obj), status.HTTP_400_BAD_REQUEST
     except DoesNotExist:
         msg_content = "Dear " + data.firstName + ", <br><br> Welcome to FitTreat.<br><br> Team FitTreat"
         user = User(
@@ -52,7 +53,7 @@ def register():
         user['password'] = None
         unreadMsg = [msg for msg in user['messages'] if msg['readFlag'] is False]
         user['unreadCount'] = len(unreadMsg)
-        return jsonify(user)
+        return jsonify(user), status.HTTP_200_OK
 
 
 ''' /*** Returns Active User Details ***/ '''
@@ -65,10 +66,9 @@ def activeUser(user_id):
         user['mealAssigned'] = None
         unreadMsg = [msg for msg in user['messages'] if msg['readFlag'] is False]
         user['unreadCount'] = len(unreadMsg)
-        json_resp = jsonify(user)
-        return json_resp
+        return jsonify(user), status.HTTP_200_OK
     except DoesNotExist as e:
-        return 'Some error occurred : ' + str(e)
+        return jsonify({'stat': 'Some error occurred : ' + format(e)}), status.HTTP_400_BAD_REQUEST
 
 
 ''' /*** Updates message read/unread status ***/ '''
@@ -89,19 +89,19 @@ def messageReadStatusChange(user_id, msg_id):
                     print(e)
                     return 'Error in saving message status'
     except Exception as e:
-        return 'Some error occurred : ' + str(e)
+        return jsonify({'stat': 'Some error occurred', 'error': format(e)}), status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
 def updateGoalWeight():
     body = AttrDict(request.get_json())
     try:
-        User.objects(id=body.id).update_one(targetWeight=body.targetWeight, \
-            targetDate=body.targetDate, targetCalories=body.targetCalories, \
-            weightUnit=body.weightUnit)
+        User.objects(id=body.id).update_one(targetWeight=body.targetWeight,
+                                            targetDate=body.targetDate, targetCalories=body.targetCalories,
+                                            weightUnit=body.weightUnit)
 
-        return jsonify({'msg': 'success'})
+        return jsonify({'msg': 'success'}), status.HTTP_200_OK
     except DoesNotExist:
-        return 'No such user found', 500
+        return jsonify({'stat': 'No such user found'}), status.HTTP_400_BAD_REQUEST
 
 
 def reloadMessages(id):
@@ -111,26 +111,27 @@ def reloadMessages(id):
         return jsonify({
             'msgSummary': user.unreadCount,
             'messages': user.messages
-        })
+        }), status.HTTP_200_OK
     except DoesNotExist:
-        return 'No such user found', 400
+        return jsonify({'stat': 'No such user found'}), status.HTTP_400_BAD_REQUEST
 
 
 def updateProfile():
     body = AttrDict(request.get_json())
 
-    User.objects(id=body.id).update_one(\
-        weight = body.weight,
-        weightUnit = body.weightUnit,
-        height = body.height,
-        heightUnit = body.heightUnit,
-        foodPreference = body.foodPreference,
-        medicalCondition = body.medicalCondition,
-        firstName = body.firstName,
-        lastName = body.lastName
+    User.objects(id=body.id).update_one(
+        weight=body.weight,
+        weightUnit=body.weightUnit,
+        height=body.height,
+        heightUnit=body.heightUnit,
+        foodPreference=body.foodPreference,
+        medicalCondition=body.medicalCondition,
+        firstName=body.firstName,
+        lastName=body.lastName
     )
 
     return activeUser(body.id)
+
 
 def userPhotoUpdate():
     body = AttrDict(request.get_json())
@@ -138,11 +139,12 @@ def userPhotoUpdate():
     try:
         upd = User.objects(id=body.id).update_one(userPhoto=body.userPhoto)
         if upd:
-            return jsonify({ 'id':body.id, 'photoString':body.userPhoto })
+            return jsonify({'id': body.id, 'photoString': body.userPhoto}), status.HTTP_200_OK
         else:
-            return 'Cannot update profile photo', 500
+            return jsonify({'msg': 'Cannot update profile photo'}), status.HTTP_500_INTERNAL_SERVER_ERROR
     except DoesNotExist:
-        return 'No such user found', 400
+        return jsonify({'stat': 'No such user found'}), status.HTTP_400_BAD_REQUEST
+
 
 def changePassword(email):
     try:
@@ -153,14 +155,14 @@ def changePassword(email):
         fern = Fernet(Config.crptrKey)
         resetToken = fern.encrypt('{}r353tT0k3n'.format(userId).encode()).decode('utf-8')
         resetExpiryTime = datetime.now() + timedelta(minutes=30)
-        
-        User.objects(id=userId)\
+
+        User.objects(id=userId) \
             .update_one(resetPasswordToken=resetToken, resetPasswordExpires=resetExpiryTime)
-        
+
         userName = user.firstName
         link = "http://" + Config.uri + "/api/passwordResetRedirect?token=" + resetToken + "&id=" + str(userId)
 
-        #return render_template('changePassword.html', username=userName, link=link)
+        # return render_template('changePassword.html', username=userName, link=link)
 
         msg = MIMEText(render_template('changePassword.html', username=userName, link=link), 'html')
         msg['Subject'] = 'FitTreat : Password Reset'
@@ -175,26 +177,26 @@ def changePassword(email):
             s.sendmail('consult.saurabh@gmail.com', [email], msg.as_string())
             s.close()
             print('mail sent')
-            return jsonify({'msg': 'Please check your registered email'}), 200
+            return jsonify({'msg': 'Please check your registered email'}), status.HTTP_200_OK
         except Exception as e:
             print('error while sending mail')
             print(e)
-            return jsonify({'msg': 'Some error occurred.'}), 400
+            return jsonify({'msg': 'Some error occurred.'}), status.HTTP_400_BAD_REQUEST
     except DoesNotExist:
-        return 'No user found with email - {}'.format(email), 404
+        return jsonify({'stat': 'No user found with email - {}'.format(email)}), status.HTTP_404_NOT_FOUND
 
 
 def resetPassword():
     try:
         body = AttrDict(request.get_json())
-        
+
         token = body.token
         dob = body.dob
         password = body.password
 
         fern = Fernet(Config.crptrKey)
         decryptToken = fern.decrypt(token.encode()).decode()
-        
+
         userId = decryptToken[0:decryptToken.index("r353tT0k3n")]
 
         print(userId)
@@ -207,12 +209,12 @@ def resetPassword():
                     User.objects(id=userId).update_one(password=password, resetPasswordExpires=datetime.now())
                     return app.send_static_file('passwordReset/passwordChangeSuccess.html')
                 else:
-                    return jsonify({'msg': 'DOB did not match'}), 500
+                    return jsonify({'msg': 'DOB did not match'}), status.HTTP_400_BAD_REQUEST
             else:
                 return app.send_static_file('passwordReset/passwordLinkExpired.html')
-            
+
         except DoesNotExist:
-            return 'No such user found', 400
+            return jsonify({'stat': 'No such user found'}), status.HTTP_400_BAD_REQUEST
     except Exception as e:
         print(e)
-        return 'Something wrong happened', 500
+        return jsonify({'stat': 'Something wrong happened'}), status.HTTP_500_INTERNAL_SERVER_ERROR

@@ -1,25 +1,25 @@
+import json
+
 from flask import request
 from flask.json import jsonify
 
 from attrdict import AttrDict
 from mongoengine import DoesNotExist
+from flask_api import status
 
 from app.models.appData import AppData
 
+
 def setAppDefaultData(id):
     data = AttrDict(request.get_json())
-    print('printing data')
-    print(data)
-
     try:
         ad = AppData.objects(id=id).update_one(aboutSection=data.aboutSection, references=data.references)
         print('printing ad')
-        print(jsonify(ad))
-        return jsonify({'status': 'success'})
+        return jsonify({'status': 'success'}), status.HTTP_200_OK
     except Exception as e:
         print('Error while saving app data', e)
-        return 'Error while saving app data', 400
+        return jsonify({'Error': format(e)}), status.HTTP_400_BAD_REQUEST
 
 
 def getAppDefaultData():
-    return jsonify(AppData.objects.get())
+    return jsonify(AppData.objects.get()), status.HTTP_200_OK

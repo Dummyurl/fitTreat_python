@@ -30,11 +30,10 @@ def bulkSymptomsUpload():
                 try:
                     symptom.save()
                 except Exception as e:
-                    print(e.with_traceback())
-                    return format(e.with_traceback()), status.HTTP_500_INTERNAL_SERVER_ERROR
+                    return jsonify({'Error': format(e)}), status.HTTP_500_INTERNAL_SERVER_ERROR
         except Exception as e:
             print(e)
-            return 'Error Occurred : ' + format(e), status.HTTP_500_INTERNAL_SERVER_ERROR
+            return jsonify({'Error': format(e)}), status.HTTP_500_INTERNAL_SERVER_ERROR
     return jsonify({'status': 'Data inserted successfully'}), 200
 
 
@@ -42,21 +41,21 @@ def bulkSymptomsUpload():
 
 
 def first5Symptoms():
-    return jsonify(Symptom.objects[:5])
+    return jsonify(Symptom.objects[:5]), status.HTTP_200_OK
 
 
 ''' Search Symptom'''
 
 
 def searchSymptom(searchParam):
-    return jsonify(Symptom.objects(name__icontains=searchParam))
+    return jsonify(Symptom.objects(name__icontains=searchParam)), status.HTTP_200_OK
 
 
 ''' Get all symptoms'''
 
 
 def getAllSymptoms():
-    return jsonify(Symptom.objects)
+    return jsonify(Symptom.objects), status.HTTP_200_OK
 
 
 ''' Delete symptoms '''
@@ -68,11 +67,11 @@ def deleteSymptoms():
         delSymps = Symptom.objects(id__in=idArr)
         if delSymps:
             delSymps = delSymps.delete()
-            return jsonify(delSymps)
+            return jsonify(delSymps), status.HTTP_200_OK
         else:
-            return 'Symptoms not deleted', 400
+            return jsonify({'stat': 'Symptoms not deleted'}), status.HTTP_400_BAD_REQUEST
     except Exception as e:
-        return 'Unable to delete symptoms - {}'.format(e)
+        return jsonify({'stat': 'Unable to delete symptoms - {}'.format(e)}), status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
 def addNewSymptom():
@@ -84,6 +83,6 @@ def addNewSymptom():
 
         return jsonify(newSymp)
     except NotUniqueError:
-        return 'Symptom already exists.'
+        return jsonify({'status': 'Symptom already exists.'}), status.HTTP_200_OK
     except Exception as e:
-        return 'Error while saving symptom', 400
+        return jsonify({'status': 'Error while saving symptom'}), status.HTTP_500_INTERNAL_SERVER_ERROR

@@ -27,13 +27,12 @@ except DoesNotExist:
 except Exception as e:
     print('general error', e)
 
-
 if __name__ == '__main__':
     pass
-    #print('running on main')
+    # print('running on main')
 else:
     pass
-    #print('running on', __name__)
+    # print('running on', __name__)
 
 print('App running on port {}'.format(Config.port))
 app.run(host='0.0.0.0', port=Config.port)
