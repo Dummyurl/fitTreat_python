@@ -13,7 +13,6 @@ from datetime import datetime, timedelta
 
 from mongoengine import NotUniqueError
 
-
 def addNewMeal():
     data = AttrDict(request.get_json())
     try:
@@ -79,12 +78,123 @@ def addMealData():
 
         - Meal Selection depending on the course - No Logic provided (Pending)
         - Meals limit - Total 15
-        - For Vegetarian: Random Selection of Vegan + Vegetarian
-        - For Non-Vegetarian - 5 Veg + Vegan (Random Selection) + 10 Non-Vegetarian
+            - Breakfast: 3
+            - Lunch: 4
+            - Dinner: 4
+            - Snacks: 4
+            * For Vegan
+                - All 15 Vegan
+            * For Vegetarian: Random Selection of Vegan + Vegetarian
+                Vegan
+                    Breakfast - 1
+                    Lunch - 1
+                    Dinner - 1
+                    Snacks - 1
+                Vegetarian
+                    Breakfast - 2
+                    Lunch - 3
+                    Dinner - 3
+                    Snacks - 3
+            * For Non-Vegetarian - 5 Veg + Vegan (Random Selection) + 10 Non-Vegetarian
+                Vegetarian
+                    Breakfast - 1
+                    Lunch - 1
+                    Dinner - 1
+                    Snacks - 1    
+                Non-Vegetarian
+                    Breakfast - 3
+                    Lunch - 3
+                    Dinner - 3
+                    Snacks - 3
     
     */
 '''
 
+class meal_plan_count:
+    vegan = {'Breakfast':3,'Lunch':4,'Dinner':4,'Snacks':4}
+    vegetarian = {'vegan':{'Breakfast':1,'Lunch':1,'Dinner':1,'Snacks':1},
+                  'vegetarian': {'Breakfast':2,'Lunch':3,'Dinner':3,'Snacks':3}}
+    non_veg = {'vegetarian': {'Breakfast':1,'Lunch':1,'Dinner':1,'Snacks':1},
+               'non_veg':{'Breakfast':2,'Lunch':3,'Dinner':3,'Snacks':3}}
+
+
+''' Method to fetch Vegan meals '''
+def vegan_meals(assignedMealIds,usersMedicalCondition):
+    vegan_plan_count = meal_plan_count.vegan
+    breakfast = Meal.objects(id__nin=assignedMealIds,foodPreference__in=['Vegan'],course__in=['Breakfast'],
+                                        avoidableMedCond__nin=usersMedicalCondition)[:vegan_plan_count['Breakfast']]
+    lunch = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegan'], course__in=['Lunch'],
+                             avoidableMedCond__nin=usersMedicalCondition)[:vegan_plan_count['Lunch']]
+    dinner = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegan'], course__in=['Dinner'],
+                             avoidableMedCond__nin=usersMedicalCondition)[:vegan_plan_count['Dinner']]
+    snacks = Meal.objects(id__nin=assignedMealIds,foodPreference__in=['Vegan'],course__in=['Snacks'],
+                                        avoidableMedCond__nin=usersMedicalCondition)[:vegan_plan_count['Snacks']]
+    return list(breakfast) + list(lunch) + list(dinner) + list(snacks)
+
+''' Method to fetch Vegetarian meals '''
+def vegetarian_meals(assignedMealIds,usersMedicalCondition,vegan_count,veg_count):
+
+    # ****** Vegan Dishes ******
+    vegan_plan_count = meal_plan_count.vegetarian['vegan']
+    vega_breakfast = Meal.objects(id__nin=assignedMealIds,foodPreference__in=['Vegan'],course__in=['Breakfast'],
+                                        avoidableMedCond__nin=usersMedicalCondition)[:vegan_plan_count['Breakfast']]
+    vega_lunch = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegan'], course__in=['Lunch'],
+                             avoidableMedCond__nin=usersMedicalCondition)[:vegan_plan_count['Lunch']]
+    vega_dinner = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegan'], course__in=['Dinner'],
+                             avoidableMedCond__nin=usersMedicalCondition)[:vegan_plan_count['Dinner']]
+    vega_snacks = Meal.objects(id__nin=assignedMealIds,foodPreference__in=['Vegan'],course__in=['Snacks'],
+                                        avoidableMedCond__nin=usersMedicalCondition)[:vegan_plan_count['Snacks']]
+    vega_meals = list(vega_breakfast) + list(vega_lunch) + list(vega_dinner) + list(vega_snacks)
+
+    # ****** Vegetarian Dishes ******
+    veget_plan_count = meal_plan_count.vegetarian['vegetarian']
+    veg_breakfast = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegetarian'], course__in=['Breakfast'],
+                                  avoidableMedCond__nin=usersMedicalCondition)[:veget_plan_count['Breakfast']]
+    veg_lunch = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegetarian'], course__in=['Lunch'],
+                              avoidableMedCond__nin=usersMedicalCondition)[:veget_plan_count['Lunch']]
+    veg_dinner = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegetarian'], course__in=['Dinner'],
+                               avoidableMedCond__nin=usersMedicalCondition)[:veget_plan_count['Dinner']]
+    veg_snacks = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegetarian'], course__in=['Snacks'],
+                               avoidableMedCond__nin=usersMedicalCondition)[:veget_plan_count['Snacks']]
+
+    veg_meals = list(veg_breakfast) + list(veg_lunch) + list(veg_dinner) + list(veg_snacks)
+    return  vega_meals + veg_meals
+
+
+''' Method to fetch Non-Vegetarian meals '''
+
+
+def non_veg_meals(assignedMealIds,usersMedicalCondition):
+
+    # ****** Vegetarian Dishes ******
+    veg_plan_count = meal_plan_count.non_veg['vegetarian']
+    veg_breakfast = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegetarian'], course__in=['Breakfast'],
+                                  avoidableMedCond__ne=usersMedicalCondition)[:veg_plan_count['Breakfast']]
+    veg_lunch = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegetarian'], course__in=['Lunch'],
+                              avoidableMedCond__ne=usersMedicalCondition)[:veg_plan_count['Lunch']]
+    veg_dinner = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegetarian'], course__in=['Dinner'],
+                               avoidableMedCond__ne=usersMedicalCondition)[:veg_plan_count['Dinner']]
+    veg_snacks = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegetarian'], course__in=['Snacks'],
+                               avoidableMedCond__ne=usersMedicalCondition)[:veg_plan_count['Snacks']]
+    veg_meals = list(veg_breakfast) + list(veg_lunch) + list(veg_dinner) + list(veg_snacks)
+    print("Vege Meals : " + len(veg_meals))
+
+    # ****** Non-Vegetarian Dishes ******
+    nonveg_plan_count = meal_plan_count.non_veg['non_veg']
+    nonveg_breakfast = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Non-Vegetarian'], course__in=['Breakfast'],
+                                 avoidableMedCond__ne=usersMedicalCondition)[:nonveg_plan_count['Breakfast']]
+    nonveg_lunch = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Non-Vegetarian'], course__in=['Lunch'],
+                             avoidableMedCond__ne=usersMedicalCondition)[:nonveg_plan_count['Lunch']]
+    nonveg_dinner = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Non-Vegetarian'], course__in=['Dinner'],
+                              avoidableMedCond__ne=usersMedicalCondition)[:nonveg_plan_count['Dinner']]
+    nonveg_snacks = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Non-Vegetarian'], course__in=['Snacks'],
+                              avoidableMedCond__ne=usersMedicalCondition)[:nonveg_plan_count['Snacks']]
+
+    nonveg_meals = list(nonveg_breakfast) + list(nonveg_lunch) + list(nonveg_dinner) + list(nonveg_snacks)
+    print("Non-Veg Meals : " + len(nonveg_meals))
+    return veg_meals + nonveg_meals
+
+''' Method to assign generated meal plans to user and set expiry'''
 def getMeals(userId):
     try:
         user = User.objects(id=userId).get()
@@ -96,8 +206,8 @@ def getMeals(userId):
         if user and user['mealExpiry']:
             ''' Check for meal plan expiry'''
             tzinf = tz.tz.tzoffset('TZONE', int(user['timeZone'])/1000)  # creating the user's timezone by
-            localCurrentTime = utils.default_tzinfo(datetime.now(),tzinf) #datetime.now(tz=tzinf)  # creating local time
-
+            localCurrentTime = utils.default_tzinfo(datetime.now(),tzinf)  # datetime.now(tz=tzinf)
+                                                                           # creating local time
             # Check if meal plan has expired
             if localCurrentTime > utils.default_tzinfo(user['mealExpiry'],tzinf):
                 newMealsFlag = True
@@ -110,47 +220,32 @@ def getMeals(userId):
                     return jsonify({'stat':'Some error occurred'}), status.HTTP_500_INTERNAL_SERVER_ERROR
         else:
             newMealsFlag = True
-        if newMealsFlag:
-                    # User's medical condition consideration - Check 2
-            usersMedicalCondition = user['medicalCondition']
-            # Meal Preference Counts initialize
-            foodPref = []
-            vegLimit = 15
-            nonVegLimit = 0
-            if user['foodPreference'] == 'Vegan':
-                foodPref = ['Vegan']
-            elif user['foodPreference'] == 'Vegetarian':
-                foodPref = ['Vegan','Vegetarian']
-            else:
-                foodPref = ['Vegan','Vegetarian']
-                vegLimit = 5
-                nonVegLimit = 10
 
-            # Query Array Initialize
-            try:
-                for obj in user['mealAssigned']:
-                    print(obj)
-                vegQuery = Meal.objects(id__nin=assignedMealIds,foodPreference__in=foodPref,
-                                        avoidableMedCond__nin=usersMedicalCondition)[:vegLimit]
-                if user['foodPreference'] == 'Non-Vegetarian':
-                    nonVegQuery = Meal.objects(id__nin=assignedMealIds,foodPreference__in=['Non-Vegetarian'],
-                                               avoidableMedCond__nin=usersMedicalCondition)[:nonVegLimit]
-                    res = list(vegQuery) + list(nonVegQuery)
-                else:
-                    res = vegQuery
-            except Exception as dbe:
-                print('Error while querying meals : ' + format(dbe))
-                return jsonify({'error':format(dbe)}),status.HTTP_500_INTERNAL_SERVER_ERROR
-            ''' Assigning generated plan to the user '''
+        # ******* New Meal Assignment Starts Here *******
+        if newMealsFlag:
+            usersMedicalCondition = user['medicalCondition']
+            generated_plan = []
+            if user['foodPreference'] == 'Vegan':
+                generated_plan = vegan_meals(assignedMealIds,usersMedicalCondition)
+                print("Vegan Count : " + str(len(generated_plan)))
+            elif user['foodPreference'] == 'Vegetarian':
+                generated_plan = vegetarian_meals(assignedMealIds,usersMedicalCondition)
+                print("Vege Count : " + str(len(generated_plan)))
+            else:
+                generated_plan = non_veg_meals(assignedMealIds,usersMedicalCondition)
+                print("Non-Veg Count : " + str(len(generated_plan)))
+
+            # ****** Assigning generated plan to the user ******
+
             tzinf = tz.tz.tzoffset('TZONE', int(user['timeZone'])/1000)
             localCurrentTime = utils.default_tzinfo(datetime.now(),tzinf) # datetime.now(tz=tzinf)
             expiryTime = localCurrentTime + timedelta(days=1)
             user['mealExpiry'] = utils.default_tzinfo(expiryTime.replace(hour=5, minute=0, second=0, microsecond=0),tzinf)
-            user['mealAssigned'] = res
-        user.save()
-        return jsonify(user['mealAssigned']),200
+            user['mealAssigned'] = generated_plan
+            user.save()
+            return jsonify(user['mealAssigned']), status.HTTP_200_OK
     except Exception as e:
-        return format(e),500
+        return format(e), status.HTTP_500_INTERNAL_SERVER_ERROR
 
 '''
     Service to filter meals
