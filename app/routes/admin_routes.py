@@ -11,13 +11,13 @@ import bson
 from app import app, mdb
 from app.controller import appData_controller, meal_controller, medicine_controller, symptom_controller
 
-''' /* Edit App Data  */ ''' #done
+''' /* Edit App Data  */ ''' #done - tested
 @app.route('/admin/editAppData/<id>', methods=['PUT'])
 def editAppData(id):
     return appData_controller.setAppDefaultData(id)
 
 
-'''  /* Add Meals in bulk */ ''' #done
+'''  /* Add Meals in bulk */ ''' #done - tested
 @app.route('/admin/addMeals', methods=['POST'])
 def addMeals():
     return meal_controller.addMealData()

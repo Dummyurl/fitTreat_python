@@ -269,45 +269,27 @@ def filterMeals(type, foodPref, userId):
     try:
         user = User.objects(id=userId).get()
         usersMedicalCondition = user['medicalCondition']
-        srchArr = [];
+        foodPrefArr = []
         exstMealSrchFlag = False
-        if type == 'Snacks':
-            srchArr = ['Snack']
-            print(type)
-        elif type == 'Breakfast':
-            srchArr = ['Breakfast']
-            exstMealSrchFlag = True
-        elif type == 'Lunch':
-            srchArr = ['Lunch']
-            exstMealSrchFlag = True
-        elif type == 'Dinner':
-            srchArr = ['Dinner']
-            exstMealSrchFlag = True
-        else:
-            srchArr = ['Soup', 'Juice']
-
+        srchArr = [type];
         vegLimit = 10;
         nonVegLimit = 0;
-        if foodPref == 'Vegan':
-            foodPref = ['Vegan']
-        elif foodPref == 'Vegetarian':
-            foodPref = ['Vegan', 'Vegetarian']
-        else:
-            foodPref = ['Vegan', 'Vegetarian']
+        if type == 'Snack' or 'Soup' or 'Juice':
+            exstMealSrchFlag = True
+        if foodPref == 'Non-Vegetarian':
+            foodPrefArr = ['Vegan', 'Vegetarian']
             vegLimit = 5
             nonVegLimit = 5
+        else:
+            foodPrefArr = [foodPref]
         if exstMealSrchFlag:
             res = []
             mealAssigned = [meal['id'] for meal in user['mealAssigned']]
-            vegQuery = Meal.objects(id__in=mealAssigned, foodPreference__in=foodPref, course__in=srchArr)
-            if foodPref == 'Non-Vegetarian':
-                nonVegQuery = Meal.objects(id__in=mealAssigned, foodPref__in=['Non-Vegetarian'], course__in=srchArr)
-                res = list(vegQuery) + list(nonVegQuery)
-            else:
-                res = list(vegQuery)
+            mealQuery = Meal.objects(id__in=mealAssigned, course__in=srchArr)
+            res = list(mealQuery)
             return jsonify(res), status.HTTP_200_OK
         else:
-            vegQuery = Meal.objects(foodPreference__in=foodPref, course__in=srchArr,
+            vegQuery = Meal.objects(foodPreference__in=foodPrefArr, course__in=srchArr,
                                     avoidableMedCond__ne=usersMedicalCondition)[:vegLimit]
             if foodPref == 'Non-Vegetarian':
                 nonVegQuery = Meal.objects(foodPreference__in=['Non-Vegetarian'], course__in=srchArr,

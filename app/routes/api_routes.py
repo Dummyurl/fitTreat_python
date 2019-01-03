@@ -103,7 +103,7 @@ def updateProfile():
 
 @app.route('/api/photoUpdate', methods=['POST'])
 def photoUpdate():
-    return user_controller.userPhotoUpdate()  # done
+    return user_controller.userPhotoUpdate()  # done - Tested
 
 
 ''' /*** Get meals assigned to user ***/ '''
@@ -111,7 +111,7 @@ def photoUpdate():
 
 @app.route('/api/getMeals/<userId>')
 def getMeals(userId):
-    return meal_controller.getMeals(userId)  # done
+    return meal_controller.getMeals(userId)  # done - Tested
 
 
 ''' /*** Filter meals ***/ '''
@@ -119,7 +119,7 @@ def getMeals(userId):
 
 @app.route('/api/filterMeals/<type>/<foodPref>/<userId>')
 def filterMeals(type, foodPref, userId):
-    return meal_controller.filterMeals(type, foodPref, userId)  # done
+    return meal_controller.filterMeals(type, foodPref, userId)  # done - Tested
 
 
 ''' /* Initial Symptoms */ '''
@@ -127,7 +127,7 @@ def filterMeals(type, foodPref, userId):
 
 @app.route('/api/initialSymptoms')
 def initialSymptoms():
-    return symptom_controller.first5Symptoms()  # done
+    return symptom_controller.first5Symptoms()  # done - Tested
 
 
 ''' /* Search Symptom */ '''
@@ -135,7 +135,7 @@ def initialSymptoms():
 
 @app.route('/api/searchSymptoms/<searchParam>')
 def searchSymptoms(searchParam):
-    return symptom_controller.searchSymptom(searchParam=searchParam)  # done
+    return symptom_controller.searchSymptom(searchParam=searchParam)  # done - Tested
 
 
 ''' /*** Get app data ***/ '''
@@ -143,7 +143,7 @@ def searchSymptoms(searchParam):
 
 @app.route('/api/getAppData')
 def getAppData():
-    return appData_controller.getAppDefaultData()  # done
+    return appData_controller.getAppDefaultData()  # done - Tested
 
 
 ''' /*** Send message to admin ***/ '''  # done
