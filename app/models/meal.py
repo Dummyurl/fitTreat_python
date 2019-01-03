@@ -12,12 +12,12 @@ from mongoengine.fields import ListField
 
 class Meal(Document):
     name = StringField(required=True, unique=True)
-    foodPreference = BaseField(default='Vegetarian', choices=["Vegan", "Vegetarian", "Non-Vegetarian"])
+    foodPreference = StringField(default='Vegetarian') # choices=["Vegan", "Vegetarian", "Non-Vegetarian"])
     cuisine = StringField()
     dietType = ListField(StringField(), default=['No Data Available'])
     idealMedCond = ListField(StringField())
     avoidableMedCond = ListField(StringField())
-    course = BaseField(default='Snack', choices=["Breakfast", "Lunch", "Dinner", "Snack", "Soup", "Juice"])
+    course = ListField(StringField(default='Snack'))  # choices=["Breakfast", "Lunch", "Dinner", "Snack", "Soup", "Juice"])
     calories = IntField(default=0)
     nutritionInfo = StringField()
     ingredients = StringField()
