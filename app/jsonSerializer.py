@@ -4,13 +4,13 @@ from app.models.user import Users, Messages
 from app.models.meal import Meals
 from app.models.medicines import Medicines
 from app.models.symptoms import Symptoms
-from app.models.appData import App_Data
+from app.models.appData import AppData
 
 from mongoengine import DoesNotExist
 
 class Encoder(JSONEncoder):
     def default(self, obj):
-        if isinstance(obj, App_Data):
+        if isinstance(obj, AppData):
             return {
                 '_id': str(obj.id),
                 'aboutSection': obj.aboutSection,
