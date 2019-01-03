@@ -8,7 +8,7 @@ from mongoengine.fields import StringField
 from mongoengine.fields import ListField
 
 
-class Medicine(Document):
+class Medicines(Document):
     name = StringField()
     dosage = StringField()
     instructions = StringField()
