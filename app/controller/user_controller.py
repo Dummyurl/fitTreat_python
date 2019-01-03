@@ -39,7 +39,7 @@ def register():
             gender=data.gender,
             password=data.password,
             dateOfBirth=data.dateOfBirth,
-            age=data.age if data.age else 0,
+            # age=data.age if data.age else 0,
             weight=data.weight,
             weightUnit=data.weightUnit,
             height=data.height,
