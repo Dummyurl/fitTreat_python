@@ -23,12 +23,14 @@ def bulkSymptomsUpload():
                 medArr.append(medRef)
             symptom = None
             try:
-                symptom = Symptom.objects(name=symp['symptom']['name'])
+                symptom = Symptom.objects(name=symp['symptom']['name']).get()
+                print(symp['symptom']['name'])
             except DoesNotExist:
                 symptom = Symptom(name=symp['symptom']['name'], medicines=medArr,
                                   indications=symp['indications'] if 'indications' in symp else None)
                 try:
                     symptom.save()
+                    print("saved  : " + symp['symptom']['name'])
                 except Exception as e:
                     return jsonify({'Error': format(e)}), status.HTTP_500_INTERNAL_SERVER_ERROR
         except Exception as e:
@@ -67,7 +69,7 @@ def deleteSymptoms():
         delSymps = Symptom.objects(id__in=idArr)
         if delSymps:
             delSymps = delSymps.delete()
-            return jsonify(delSymps), status.HTTP_200_OK
+            return jsonify({'stat': 'Success'}), status.HTTP_200_OK
         else:
             return jsonify({'stat': 'Symptoms not deleted'}), status.HTTP_400_BAD_REQUEST
     except Exception as e:

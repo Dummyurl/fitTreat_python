@@ -137,7 +137,7 @@ def deleteCollection(name):
         print('Wrong collection name provided: {}'.format(name))
         return 'Wrong collection name provided: {}'.format(name), 400
 
-    return '{} collection deleted'.format(name), 200
+    return jsonify('{} collection deleted'.format(name)), 200
 
 
 '''  /* Clear DB */ ''' #done

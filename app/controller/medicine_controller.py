@@ -26,7 +26,7 @@ def deleteMeds():
         delMeds = Medicine.objects(id__in=idArr)
         if delMeds:
             delMeds = delMeds.delete()
-            return jsonify(delMeds)
+            return jsonify({'stat': 'Success'}),status.HTTP_200_OK
         else:
             return jsonify({'stat': 'Medicines not deleted'}), status.HTTP_500_INTERNAL_SERVER_ERROR
     except Exception as e:
