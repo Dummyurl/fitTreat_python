@@ -139,7 +139,7 @@ def vegan_meals(assignedMealIds, usersMedicalCondition):
 ''' Method to fetch Vegetarian meals '''
 
 
-def vegetarian_meals(assignedMealIds, usersMedicalCondition, vegan_count, veg_count):
+def vegetarian_meals(assignedMealIds, usersMedicalCondition):
     # ****** Vegan Dishes ******
     vegan_plan_count = meal_plan_count.vegetarian['vegan']
     vega_breakfast = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegan'], course__in=['Breakfast'],

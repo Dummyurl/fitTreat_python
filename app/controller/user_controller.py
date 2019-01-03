@@ -95,11 +95,11 @@ def messageReadStatusChange(user_id, msg_id):
 def updateGoalWeight():
     body = AttrDict(request.get_json())
     try:
-        User.objects(id=body.id).update_one(targetWeight=body.targetWeight,
-                                            targetDate=body.targetDate, targetCalories=body.targetCalories,
+        User.objects(id=body.id).update_one(targetWeight=int(body.targetWeight),
+                                            targetDate=str(datetime.fromtimestamp(body.targetDate/1000)), targetCalories=int(body.targetCalories),
                                             weightUnit=body.weightUnit)
 
-        return jsonify({'msg': 'success'}), status.HTTP_200_OK
+        return jsonify({'status': 'success'}), status.HTTP_200_OK
     except DoesNotExist:
         return jsonify({'stat': 'No such user found'}), status.HTTP_400_BAD_REQUEST
 
@@ -109,7 +109,7 @@ def reloadMessages(id):
         user = User.objects(id=id).get()
 
         return jsonify({
-            'msgSummary': user.unreadCount,
+            'msgSummary': {'totalCount':len(list(user.messages)),'unreadCount':user.unreadCount},
             'messages': user.messages
         }), status.HTTP_200_OK
     except DoesNotExist:
@@ -206,8 +206,14 @@ def resetPassword():
 
             if datetime.now() < user.resetPasswordExpires:
                 if user.dateOfBirth == dob:
-                    User.objects(id=userId).update_one(password=password, resetPasswordExpires=datetime.now())
-                    return app.send_static_file('passwordReset/passwordChangeSuccess.html')
+                    # user = User.objects(id=userId).get().update_one(password=password, resetPasswordExpires=datetime.now())
+                    user['password'] = password
+                    try:
+                        user.save()
+                        return app.send_static_file('passwordReset/passwordChangeSuccess.html')
+                    except Exception as e:
+                        print(format(e))
+                        return jsonify({'Error' : format(e)}),status.HTTP_500_INTERNAL_SERVER_ERROR
                 else:
                     return jsonify({'msg': 'DOB did not match'}), status.HTTP_400_BAD_REQUEST
             else:

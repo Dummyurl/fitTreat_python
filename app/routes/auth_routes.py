@@ -18,15 +18,15 @@ def test():
         return 'Password Mis-match'
 
 
-''' /*** User Registration ***/ '''  # done
+''' /*** User Registration ***/ '''  # done - Tested
 
 
 @app.route('/auth/register', methods=['POST'])
 def register():
-    return user_controller.register(), status.HTTP_200_OK
+    return user_controller.register()
 
 
-''' /*** User Login ***/ '''  # done
+''' /*** User Login ***/ '''  # done - Tested
 
 
 @app.route('/auth/login', methods=['POST'])

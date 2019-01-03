@@ -6,7 +6,7 @@ from mongoengine import DoesNotExist
 from datetime import datetime, timedelta
 from flask_api import status
 
-''' /*** Pull Active User Details ***/ '''  # done
+''' /*** Pull Active User Details ***/ '''  # done Tested
 
 
 @app.route('/api/loggedInUser/<user_id>')
@@ -14,18 +14,18 @@ def loggedInUser(user_id):
     return user_controller.activeUser(user_id)
 
 
-''' /*** Send password change email to user ***/ '''  # done
+''' /*** Send password change email to user ***/ '''
 
 
-@app.route('/api/changePassword/<email>')
+@app.route('/api/changePassword/<email>') # done - Partly Tested
 def changePassword(email):
     return user_controller.changePassword(email)
 
 
-''' /*** Show password change view ***/ '''  # done
+''' /*** Show password change view ***/ '''
 
 
-@app.route('/api/passwordResetRedirect')
+@app.route('/api/passwordResetRedirect') # done - Partly tested
 def passwordResetRedirect():
     token = request.args.get('token')
     id = request.args.get('id')
@@ -58,7 +58,7 @@ def passwordResetRedirect():
         return jsonify({'stat': 'Id or token not found'}), status.HTTP_400_BAD_REQUEST
 
 
-''' /*** Reset user password ***/ '''  # done
+''' /*** Reset user password ***/ '''  # done - Tested
 
 
 @app.route('/api/resetPassword', methods=['POST'])
@@ -66,7 +66,7 @@ def resetPassword():
     return user_controller.resetPassword()
 
 
-''' /*** Change status of message to read/unread ***/ '''  # done
+''' /*** Change status of message to read/unread ***/ '''  # done - Tested
 
 
 @app.route('/api/readMessage/<user_id>/<msg_id>')
@@ -74,7 +74,7 @@ def readMessage(user_id, msg_id):
     return user_controller.messageReadStatusChange(user_id, msg_id)
 
 
-''' /*** Update weight target ***/ '''  # done
+''' /*** Update weight target ***/ '''  # done - Tested
 
 
 @app.route('/api/targetWeight', methods=['PUT'])
@@ -82,7 +82,7 @@ def targetWeight():
     return user_controller.updateGoalWeight()
 
 
-''' /*** Reload user messages ***/ '''  # done
+''' /*** Reload user messages ***/ '''  # done - Tested
 
 
 @app.route('/api/reloadMessages/<id>')
@@ -90,7 +90,7 @@ def reloadMessages(id):
     return user_controller.reloadMessages(id)
 
 
-''' /*** Update user profile ***/ '''  # done
+''' /*** Update user profile ***/ '''  # done - Tested
 
 
 @app.route('/api/updateProfile', methods=['PUT'])

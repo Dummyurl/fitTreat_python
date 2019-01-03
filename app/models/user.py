@@ -20,7 +20,7 @@ from app.models.meal import Meal
 
 class Messages(EmbeddedDocument):
     subject = StringField()
-    createDate = DateTimeField(default=datetime.now)
+    createDate = DateTimeField(default=datetime.utcnow())
     readFlag = BooleanField(default=False)
     content = StringField()
     _id = ObjectIdField(default=ObjectId)
@@ -48,8 +48,8 @@ class User(Document):
     targetWeight = IntField(default=0)
     targetDate = StringField(default='')  # YYYY/MM/DD format
     targetCalories = IntField(default=0)
-    accountCreationDate = DateTimeField(default=datetime.now)
-    userPhoto = StringField()
+    accountCreationDate = DateTimeField(default=datetime.utcnow())
+    userPhoto = StringField(default='')
     messages = ListField(EmbeddedDocumentField(Messages))
     mealAssigned = ListField(ReferenceField(Meal))
     mealExpiry = DateTimeField()
