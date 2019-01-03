@@ -15,7 +15,7 @@ from mongoengine.document import EmbeddedDocument
 from mongoengine.fields import StringField, EmailField, DateTimeField, IntField, \
     EmbeddedDocumentField, ReferenceField, BooleanField
 
-from app.models.meal import Meals
+from app.models.meal import Meal
 
 
 class Messages(EmbeddedDocument):
@@ -26,7 +26,7 @@ class Messages(EmbeddedDocument):
     _id = ObjectIdField(default=ObjectId)
 
 
-class Users(Document):
+class User(Document):
     firstName = StringField(required=True)
     lastName = StringField(required=True, default='')
     email = EmailField(required=True)
@@ -51,7 +51,7 @@ class Users(Document):
     accountCreationDate = DateTimeField(default=datetime.utcnow())
     userPhoto = StringField(default='')
     messages = ListField(EmbeddedDocumentField(Messages))
-    mealAssigned = ListField(ReferenceField(Meals))
+    mealAssigned = ListField(ReferenceField(Meal))
     mealExpiry = DateTimeField()
     unreadCount = IntField(default=0)
 
@@ -64,4 +64,4 @@ class Users(Document):
         document['age'] = age.years
 
 
-pre_save.connect(Users.pre_save_func, sender=Users)
+pre_save.connect(User.pre_save_func, sender=User)

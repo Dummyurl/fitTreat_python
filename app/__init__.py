@@ -12,7 +12,7 @@ mdb = MongoEngine(app)
 
 from app import models
 from app.jsonSerializer import Encoder
-from app.routes import admin_routes, api_routes, auth_routes
+from app.routes import test_routes, admin_routes, api_routes, auth_routes
 
 app.json_encoder = Encoder
 

@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, jsonify, request
 from app import app
 from app.controller import user_controller, appData_controller, symptom_controller, meal_controller
-from app.models.user import Users
+from app.models.user import User
 from mongoengine import DoesNotExist
 from datetime import datetime, timedelta
 from flask_api import status
@@ -32,7 +32,7 @@ def passwordResetRedirect():
 
     if id and token:
         try:
-            user = Users.objects(id=id).get()
+            user = User.objects(id=id).get()
 
             print('user.id', user.id)
             print('userId', id)

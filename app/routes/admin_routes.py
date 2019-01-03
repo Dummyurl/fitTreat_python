@@ -1,13 +1,12 @@
 from attrdict import AttrDict
 from flask import request
-from flask_api import status
 from flask.json import jsonify
 from mongoengine import DoesNotExist, OperationError
 from mongoengine.connection import _get_db, _get_connection
-from app.models.user import Users, Messages
-from app.models.meal import Meals
-from app.models.medicines import Medicines
-from app.models.symptoms import Symptoms
+from app.models.user import User, Messages
+from app.models.meal import Meal
+from app.models.medicines import Medicine
+from app.models.symptoms import Symptom
 import bson
 from app import app, mdb
 from app.controller import appData_controller, meal_controller, medicine_controller, symptom_controller
@@ -100,12 +99,12 @@ def deleteSymptopms():
 @app.route('/admin/dbStats')
 def dbStats():
     obj = {
-        'users': Users.objects.count(),
-        'meals': Meals.objects.count(),
-        'medicines': Medicines.objects.count(),
-        'symptoms': Symptoms.objects.count()
+        'users': User.objects.count(),
+        'meals': Meal.objects.count(),
+        'medicines': Medicine.objects.count(),
+        'symptoms': Symptom.objects.count()
     }
-    return jsonify(obj),status.HTTP_200_OK
+    return jsonify(obj), 200
 
 
 ''' /* Bulk upload templates download */ ''' #done
@@ -124,21 +123,21 @@ def templateDownload(name):
 def deleteCollection(name):
     if name == 'users':
         print('Dropping user collection')
-        Users.drop_collection()
+        User.drop_collection()
     elif name == 'meals':
         print('Dropping meal collection')
-        Meals.drop_collection()
+        Meal.drop_collection()
     elif name == 'meds':
         print('Dropping medicine collection')
-        Medicines.drop_collection()
+        Medicine.drop_collection()
     elif name == 'symptoms':
         print('Dropping symptom collection')
-        Symptoms.drop_collection()
+        Symptom.drop_collection()
     else:
         print('Wrong collection name provided: {}'.format(name))
-        return 'Wrong collection name provided: {}'.format(name), status.HTTP_400_BAD_REQUEST
+        return 'Wrong collection name provided: {}'.format(name), 400
 
-    return '{} collection deleted'.format(name), status.HTTP_200_OK
+    return '{} collection deleted'.format(name), 200
 
 
 '''  /* Clear DB */ ''' #done
@@ -147,7 +146,7 @@ def clearDB():
     db = _get_db()
     conn = _get_connection()
     conn.drop_database(db)
-    return 'DB {} cleared'.format(db.name), status.HTTP_200_OK
+    return 'DB {} cleared'.format(db.name), 200
 
 
 ''' /*** Send Message to a user ***/ '''  #done
@@ -157,14 +156,14 @@ def sendMsgToUser():
     user_id = msg_data.userId
     new_msg = Messages(subject=msg_data.message.subject, content=msg_data.message.content)
     try:
-        user = Users.objects.get(id=bson.objectid.ObjectId(str(user_id)))
+        user = User.objects.get(id=bson.objectid.ObjectId(str(user_id)))
         user['messages'].append(new_msg)
         user.save()
         resp = {'stat': "Message Sent Successfully"}
-        return jsonify(resp), status.HTTP_200_OK
+        return jsonify(resp), 200
     except DoesNotExist as e:
         print(e)
-        return str(e), status.HTTP_404_NOT_FOUND
+        return str(e), 404
     except Exception as e:
         print(e)
-        return str(e), status.HTTP_500_INTERNAL_SERVER_ERROR
+        return str(e), 500

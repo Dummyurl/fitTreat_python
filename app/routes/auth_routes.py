@@ -2,7 +2,7 @@ from flask import render_template, redirect, url_for, jsonify, request
 from app import app
 from app.controller import user_controller
 import flask_bcrypt
-from app.models.user import Users
+from app.models.user import User
 from mongoengine.errors import DoesNotExist
 from flask_api import status
 
@@ -34,7 +34,7 @@ def login():
     email_id = request.get_json()['email']
     password = request.get_json()['password']
     try:
-        user = Users.objects(email=email_id).get()
+        user = User.objects(email=email_id).get()
         if flask_bcrypt.check_password_hash(user['password'], password):
             user['password'] = None
             user['mealAssigned'] = None

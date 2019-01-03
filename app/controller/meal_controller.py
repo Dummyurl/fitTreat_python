@@ -1,22 +1,23 @@
-from datetime import datetime, timedelta
-
-from attrdict import AttrDict
-from dateutil import tz, utils
 from flask import request
 from flask.json import jsonify
-from flask_api import status
-from mongoengine import NotUniqueError
-from mongoengine.errors import DoesNotExist
 
-from app.models.meal import Meals
-from app.models.user import Users
+from app.models.meal import Meal
+from app.models.user import User
+from attrdict import AttrDict
+from mongoengine.errors import DoesNotExist
+from mongoengine.queryset import QuerySet
 from config import Config
+from flask_api import status
+from dateutil import tz, utils
+from datetime import datetime, timedelta
+
+from mongoengine import NotUniqueError
 
 
 def addNewMeal():
     data = AttrDict(request.get_json())
     try:
-        newMeal = Meals(
+        newMeal = Meal(
             name=data.name,
             foodPreference=data.foodPreference,
             cuisine=data.cuisine,
@@ -45,10 +46,10 @@ def addMealData():
     queryList = []
     for meal in meals_array:
         try:
-            meal = Meals.objects.get(name=meal['name'])
+            meal = Meal.objects.get(name=meal['name'])
         except DoesNotExist as dne:
             data = AttrDict(meal)
-            newMeal = Meals(
+            newMeal = Meal(
                 name=data.name,
                 foodPreference=data.foodPreference,
                 cuisine=data.cuisine,
@@ -64,7 +65,7 @@ def addMealData():
             )
             queryList.append(newMeal)
     try:
-        meals = Meals.objects.insert(queryList, load_bulk=True)
+        meals = Meal.objects.insert(queryList, load_bulk=True)
         return jsonify(meals), status.HTTP_200_OK
     except Exception as e:
         return jsonify({'Error': format(e)}), status.HTTP_400_BAD_REQUEST
@@ -124,14 +125,14 @@ class meal_plan_count:
 
 def vegan_meals(assignedMealIds, usersMedicalCondition):
     vegan_plan_count = meal_plan_count.vegan
-    breakfast = Meals.objects(id__nin=assignedMealIds, foodPreference__in=['Vegan'], course__in=['Breakfast'],
-                              avoidableMedCond__nin=usersMedicalCondition)[:vegan_plan_count['Breakfast']]
-    lunch = Meals.objects(id__nin=assignedMealIds, foodPreference__in=['Vegan'], course__in=['Lunch'],
-                          avoidableMedCond__nin=usersMedicalCondition)[:vegan_plan_count['Lunch']]
-    dinner = Meals.objects(id__nin=assignedMealIds, foodPreference__in=['Vegan'], course__in=['Dinner'],
-                           avoidableMedCond__nin=usersMedicalCondition)[:vegan_plan_count['Dinner']]
-    snacks = Meals.objects(id__nin=assignedMealIds, foodPreference__in=['Vegan'], course__in=['Snacks'],
-                           avoidableMedCond__nin=usersMedicalCondition)[:vegan_plan_count['Snacks']]
+    breakfast = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegan'], course__in=['Breakfast'],
+                             avoidableMedCond__nin=usersMedicalCondition)[:vegan_plan_count['Breakfast']]
+    lunch = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegan'], course__in=['Lunch'],
+                         avoidableMedCond__nin=usersMedicalCondition)[:vegan_plan_count['Lunch']]
+    dinner = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegan'], course__in=['Dinner'],
+                          avoidableMedCond__nin=usersMedicalCondition)[:vegan_plan_count['Dinner']]
+    snacks = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegan'], course__in=['Snacks'],
+                          avoidableMedCond__nin=usersMedicalCondition)[:vegan_plan_count['Snacks']]
     return list(breakfast) + list(lunch) + list(dinner) + list(snacks)
 
 
@@ -141,26 +142,26 @@ def vegan_meals(assignedMealIds, usersMedicalCondition):
 def vegetarian_meals(assignedMealIds, usersMedicalCondition):
     # ****** Vegan Dishes ******
     vegan_plan_count = meal_plan_count.vegetarian['vegan']
-    vega_breakfast = Meals.objects(id__nin=assignedMealIds, foodPreference__in=['Vegan'], course__in=['Breakfast'],
-                                   avoidableMedCond__nin=usersMedicalCondition)[:vegan_plan_count['Breakfast']]
-    vega_lunch = Meals.objects(id__nin=assignedMealIds, foodPreference__in=['Vegan'], course__in=['Lunch'],
-                               avoidableMedCond__nin=usersMedicalCondition)[:vegan_plan_count['Lunch']]
-    vega_dinner = Meals.objects(id__nin=assignedMealIds, foodPreference__in=['Vegan'], course__in=['Dinner'],
-                                avoidableMedCond__nin=usersMedicalCondition)[:vegan_plan_count['Dinner']]
-    vega_snacks = Meals.objects(id__nin=assignedMealIds, foodPreference__in=['Vegan'], course__in=['Snacks'],
-                                avoidableMedCond__nin=usersMedicalCondition)[:vegan_plan_count['Snacks']]
+    vega_breakfast = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegan'], course__in=['Breakfast'],
+                                  avoidableMedCond__nin=usersMedicalCondition)[:vegan_plan_count['Breakfast']]
+    vega_lunch = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegan'], course__in=['Lunch'],
+                              avoidableMedCond__nin=usersMedicalCondition)[:vegan_plan_count['Lunch']]
+    vega_dinner = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegan'], course__in=['Dinner'],
+                               avoidableMedCond__nin=usersMedicalCondition)[:vegan_plan_count['Dinner']]
+    vega_snacks = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegan'], course__in=['Snacks'],
+                               avoidableMedCond__nin=usersMedicalCondition)[:vegan_plan_count['Snacks']]
     vega_meals = list(vega_breakfast) + list(vega_lunch) + list(vega_dinner) + list(vega_snacks)
 
     # ****** Vegetarian Dishes ******
     veget_plan_count = meal_plan_count.vegetarian['vegetarian']
-    veg_breakfast = Meals.objects(id__nin=assignedMealIds, foodPreference__in=['Vegetarian'], course__in=['Breakfast'],
-                                  avoidableMedCond__nin=usersMedicalCondition)[:veget_plan_count['Breakfast']]
-    veg_lunch = Meals.objects(id__nin=assignedMealIds, foodPreference__in=['Vegetarian'], course__in=['Lunch'],
-                              avoidableMedCond__nin=usersMedicalCondition)[:veget_plan_count['Lunch']]
-    veg_dinner = Meals.objects(id__nin=assignedMealIds, foodPreference__in=['Vegetarian'], course__in=['Dinner'],
-                               avoidableMedCond__nin=usersMedicalCondition)[:veget_plan_count['Dinner']]
-    veg_snacks = Meals.objects(id__nin=assignedMealIds, foodPreference__in=['Vegetarian'], course__in=['Snacks'],
-                               avoidableMedCond__nin=usersMedicalCondition)[:veget_plan_count['Snacks']]
+    veg_breakfast = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegetarian'], course__in=['Breakfast'],
+                                 avoidableMedCond__nin=usersMedicalCondition)[:veget_plan_count['Breakfast']]
+    veg_lunch = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegetarian'], course__in=['Lunch'],
+                             avoidableMedCond__nin=usersMedicalCondition)[:veget_plan_count['Lunch']]
+    veg_dinner = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegetarian'], course__in=['Dinner'],
+                              avoidableMedCond__nin=usersMedicalCondition)[:veget_plan_count['Dinner']]
+    veg_snacks = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegetarian'], course__in=['Snacks'],
+                              avoidableMedCond__nin=usersMedicalCondition)[:veget_plan_count['Snacks']]
 
     veg_meals = list(veg_breakfast) + list(veg_lunch) + list(veg_dinner) + list(veg_snacks)
     return vega_meals + veg_meals
@@ -172,28 +173,28 @@ def vegetarian_meals(assignedMealIds, usersMedicalCondition):
 def non_veg_meals(assignedMealIds, usersMedicalCondition):
     # ****** Vegetarian Dishes ******
     veg_plan_count = meal_plan_count.non_veg['vegetarian']
-    veg_breakfast = Meals.objects(id__nin=assignedMealIds, foodPreference__in=['Vegetarian'], course__in=['Breakfast'],
-                                  avoidableMedCond__ne=usersMedicalCondition)[:veg_plan_count['Breakfast']]
-    veg_lunch = Meals.objects(id__nin=assignedMealIds, foodPreference__in=['Vegetarian'], course__in=['Lunch'],
-                              avoidableMedCond__ne=usersMedicalCondition)[:veg_plan_count['Lunch']]
-    veg_dinner = Meals.objects(id__nin=assignedMealIds, foodPreference__in=['Vegetarian'], course__in=['Dinner'],
-                               avoidableMedCond__ne=usersMedicalCondition)[:veg_plan_count['Dinner']]
-    veg_snacks = Meals.objects(id__nin=assignedMealIds, foodPreference__in=['Vegetarian'], course__in=['Snacks'],
-                               avoidableMedCond__ne=usersMedicalCondition)[:veg_plan_count['Snacks']]
+    veg_breakfast = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegetarian'], course__in=['Breakfast'],
+                                 avoidableMedCond__ne=usersMedicalCondition)[:veg_plan_count['Breakfast']]
+    veg_lunch = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegetarian'], course__in=['Lunch'],
+                             avoidableMedCond__ne=usersMedicalCondition)[:veg_plan_count['Lunch']]
+    veg_dinner = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegetarian'], course__in=['Dinner'],
+                              avoidableMedCond__ne=usersMedicalCondition)[:veg_plan_count['Dinner']]
+    veg_snacks = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegetarian'], course__in=['Snacks'],
+                              avoidableMedCond__ne=usersMedicalCondition)[:veg_plan_count['Snacks']]
     veg_meals = list(veg_breakfast) + list(veg_lunch) + list(veg_dinner) + list(veg_snacks)
     print("Vege Meals : " + len(veg_meals))
 
     # ****** Non-Vegetarian Dishes ******
     nonveg_plan_count = meal_plan_count.non_veg['non_veg']
-    nonveg_breakfast = Meals.objects(id__nin=assignedMealIds, foodPreference__in=['Non-Vegetarian'],
-                                     course__in=['Breakfast'],
-                                     avoidableMedCond__ne=usersMedicalCondition)[:nonveg_plan_count['Breakfast']]
-    nonveg_lunch = Meals.objects(id__nin=assignedMealIds, foodPreference__in=['Non-Vegetarian'], course__in=['Lunch'],
-                                 avoidableMedCond__ne=usersMedicalCondition)[:nonveg_plan_count['Lunch']]
-    nonveg_dinner = Meals.objects(id__nin=assignedMealIds, foodPreference__in=['Non-Vegetarian'], course__in=['Dinner'],
-                                  avoidableMedCond__ne=usersMedicalCondition)[:nonveg_plan_count['Dinner']]
-    nonveg_snacks = Meals.objects(id__nin=assignedMealIds, foodPreference__in=['Non-Vegetarian'], course__in=['Snacks'],
-                                  avoidableMedCond__ne=usersMedicalCondition)[:nonveg_plan_count['Snacks']]
+    nonveg_breakfast = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Non-Vegetarian'],
+                                    course__in=['Breakfast'],
+                                    avoidableMedCond__ne=usersMedicalCondition)[:nonveg_plan_count['Breakfast']]
+    nonveg_lunch = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Non-Vegetarian'], course__in=['Lunch'],
+                                avoidableMedCond__ne=usersMedicalCondition)[:nonveg_plan_count['Lunch']]
+    nonveg_dinner = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Non-Vegetarian'], course__in=['Dinner'],
+                                 avoidableMedCond__ne=usersMedicalCondition)[:nonveg_plan_count['Dinner']]
+    nonveg_snacks = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Non-Vegetarian'], course__in=['Snacks'],
+                                 avoidableMedCond__ne=usersMedicalCondition)[:nonveg_plan_count['Snacks']]
 
     nonveg_meals = list(nonveg_breakfast) + list(nonveg_lunch) + list(nonveg_dinner) + list(nonveg_snacks)
     print("Non-Veg Meals : " + len(nonveg_meals))
@@ -205,7 +206,7 @@ def non_veg_meals(assignedMealIds, usersMedicalCondition):
 
 def getMeals(userId):
     try:
-        user = Users.objects(id=userId).get()
+        user = User.objects(id=userId).get()
         newMealsFlag = False
         assignedMealIds = []
         if user['mealAssigned']:
@@ -221,7 +222,7 @@ def getMeals(userId):
                 newMealsFlag = True
             else:
                 try:
-                    meals = Meals.objects(id__in=assignedMealIds)
+                    meals = Meal.objects(id__in=assignedMealIds)
                     return jsonify(meals), status.HTTP_200_OK
                 except Exception as e:
                     print('Error while getting meals ' + format(e))
@@ -266,7 +267,7 @@ def getMeals(userId):
 
 def filterMeals(type, foodPref, userId):
     try:
-        user = Users.objects(id=userId).get()
+        user = User.objects(id=userId).get()
         usersMedicalCondition = user['medicalCondition']
         foodPrefArr = []
         exstMealSrchFlag = False
@@ -284,14 +285,14 @@ def filterMeals(type, foodPref, userId):
         if exstMealSrchFlag:
             res = []
             mealAssigned = [meal['id'] for meal in user['mealAssigned']]
-            mealQuery = Meals.objects(id__in=mealAssigned, course__in=srchArr)
+            mealQuery = Meal.objects(id__in=mealAssigned, course__in=srchArr)
             res = list(mealQuery)
             return jsonify(res), status.HTTP_200_OK
         else:
-            vegQuery = Meals.objects(foodPreference__in=foodPrefArr, course__in=srchArr,
+            vegQuery = Meal.objects(foodPreference__in=foodPrefArr, course__in=srchArr,
                                     avoidableMedCond__ne=usersMedicalCondition)[:vegLimit]
             if foodPref == 'Non-Vegetarian':
-                nonVegQuery = Meals.objects(foodPreference__in=['Non-Vegetarian'], course__in=srchArr,
+                nonVegQuery = Meal.objects(foodPreference__in=['Non-Vegetarian'], course__in=srchArr,
                                            avoidableMedCond__ne=usersMedicalCondition)[:nonVegLimit]
                 res = list(vegQuery) + list(nonVegQuery)
             else:
@@ -303,14 +304,14 @@ def filterMeals(type, foodPref, userId):
 
 
 def getMealsList():
-    return jsonify(Meals.objects), status.HTTP_200_OK
+    return jsonify(Meal.objects), status.HTTP_200_OK
 
 
 def updateMeal(meal_id):
     data = AttrDict(request.get_json())
 
     try:
-        updatedMeal = Meals.objects(id=meal_id).update_one(
+        updatedMeal = Meal.objects(id=meal_id).update_one(
             name=data.name,
             foodPreference=data.foodPreference,
             cuisine=data.cuisine,
@@ -331,7 +332,7 @@ def updateMeal(meal_id):
 
 def deleteMeal(meal_id):
     try:
-        delMeal = Meals.objects(id=meal_id).get()
+        delMeal = Meal.objects(id=meal_id).get()
         delMeal.delete()
         return jsonify({'status': 'Meal deleted successfully'}), status.HTTP_200_OK
     except DoesNotExist as dne:

@@ -1,9 +1,9 @@
 from flask.json import JSONEncoder, JSONDecoder
 from flask_mongoengine import BaseQuerySet
-from app.models.user import Users, Messages
-from app.models.meal import Meals
-from app.models.medicines import Medicines
-from app.models.symptoms import Symptoms
+from app.models.user import User, Messages
+from app.models.meal import Meal
+from app.models.medicines import Medicine
+from app.models.symptoms import Symptom
 from app.models.appData import AppData
 
 from mongoengine import DoesNotExist
@@ -16,7 +16,7 @@ class Encoder(JSONEncoder):
                 'aboutSection': obj.aboutSection,
                 'references': obj.references
             }
-        elif isinstance(obj, Users):
+        elif isinstance(obj, User):
             return {
                 '_id' : str(obj.id),
                 'email': obj.email,
@@ -55,7 +55,7 @@ class Encoder(JSONEncoder):
                 'createDate':obj.createDate,
                 'readFlag':obj.readFlag
             }
-        elif isinstance(obj, Meals):
+        elif isinstance(obj, Meal):
             return {
                 '_id':str(obj.id),
                 'name': obj.name,
@@ -71,7 +71,7 @@ class Encoder(JSONEncoder):
                 'directions': obj.directions,
                 'photoURL': obj.photoURL
             }
-        elif isinstance(obj, Medicines):
+        elif isinstance(obj, Medicine):
             return {
                 '_id': str(obj.id),
                 'name': obj.name,
@@ -79,7 +79,7 @@ class Encoder(JSONEncoder):
                 'instructions': obj.instructions,
                 'ingredients': [ing for ing in obj.ingredients]
             }
-        elif isinstance(obj, Symptoms):
+        elif isinstance(obj, Symptom):
             return {
                 '_id': str(obj.id),
                 'name': obj.name,
@@ -97,17 +97,17 @@ class Encoder(JSONEncoder):
 class Decoder(JSONDecoder):
     def default(self, obj):
         #print(type(obj))
-        if isinstance(obj, Users):
+        if isinstance(obj, User):
             return {
                 'email': obj.email,
                 'firstName': obj.firstName,
                 'lastName': obj.lastName
             }
-        elif isinstance(obj, Meals):
+        elif isinstance(obj, Meal):
             pass
-        elif isinstance(obj, Medicines):
+        elif isinstance(obj, Medicine):
             pass
-        elif isinstance(obj, Symptoms):
+        elif isinstance(obj, Symptom):
             pass
         elif isinstance(obj, BaseQuerySet):
             ret = []
