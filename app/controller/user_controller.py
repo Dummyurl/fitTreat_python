@@ -170,11 +170,11 @@ def changePassword(email):
         msg['To'] = email
 
         try:
-            s = smtplib.SMTP('smtp.gmail.com', 587)
+            s = smtplib.SMTP('smtp.sendgrid.net', 465)
             s.ehlo()
             s.starttls()
-            s.login('consult.saurabh@gmail.com', 'Welcome$000')
-            s.sendmail('consult.saurabh@gmail.com', [email], msg.as_string())
+            s.login(Config.userId, Config.password)
+            s.sendmail(Config.userId, [email], msg.as_string())
             s.close()
             print('mail sent')
             return jsonify({'msg': 'Please check your registered email'}), status.HTTP_200_OK
