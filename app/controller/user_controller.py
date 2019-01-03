@@ -8,7 +8,7 @@ import bson
 from flask import request, render_template
 from flask.json import jsonify
 from app import app
-from app.models.user import User, Messages
+from app.models.user import Users, Messages
 from attrdict import AttrDict
 from datetime import datetime, timedelta
 from mongoengine import DoesNotExist
@@ -25,14 +25,14 @@ from email.mime.text import MIMEText
 def register():
     data = AttrDict(request.get_json())
     try:
-        user = User.objects(email=data.email).get()
+        user = Users.objects(email=data.email).get()
         obj = {
             'error': "Email already in use"
         }
         return jsonify(obj), status.HTTP_400_BAD_REQUEST
     except DoesNotExist:
         msg_content = "Dear " + data.firstName + ", <br><br> Welcome to FitTreat.<br><br> Team FitTreat"
-        user = User(
+        user = Users(
             firstName=data.firstName,
             lastName=data.lastName,
             email=data.email,
@@ -56,12 +56,12 @@ def register():
         return jsonify(user), status.HTTP_200_OK
 
 
-''' /*** Returns Active User Details ***/ '''
+''' /*** Returns Active Users Details ***/ '''
 
 
 def activeUser(user_id):
     try:
-        user = User.objects.get(id=bson.objectid.ObjectId(str(user_id)))
+        user = Users.objects.get(id=bson.objectid.ObjectId(str(user_id)))
         user['password'] = None
         user['mealAssigned'] = None
         unreadMsg = [msg for msg in user['messages'] if msg['readFlag'] is False]
@@ -76,7 +76,7 @@ def activeUser(user_id):
 
 def messageReadStatusChange(user_id, msg_id):
     try:
-        user = User.objects.get(id=bson.objectid.ObjectId(str(user_id)))
+        user = Users.objects.get(id=bson.objectid.ObjectId(str(user_id)))
         # message = [msg for msg in user['messages']]
         for msg in user['messages']:
             if str(msg['_id']) == msg_id:
@@ -95,7 +95,7 @@ def messageReadStatusChange(user_id, msg_id):
 def updateGoalWeight():
     body = AttrDict(request.get_json())
     try:
-        User.objects(id=body.id).update_one(targetWeight=int(body.targetWeight),
+        Users.objects(id=body.id).update_one(targetWeight=int(body.targetWeight),
                                             targetDate=str(datetime.fromtimestamp(body.targetDate/1000)), targetCalories=int(body.targetCalories),
                                             weightUnit=body.weightUnit)
 
@@ -106,7 +106,7 @@ def updateGoalWeight():
 
 def reloadMessages(id):
     try:
-        user = User.objects(id=id).get()
+        user = Users.objects(id=id).get()
 
         return jsonify({
             'msgSummary': {'totalCount':len(list(user.messages)),'unreadCount':user.unreadCount},
@@ -119,7 +119,7 @@ def reloadMessages(id):
 def updateProfile():
     body = AttrDict(request.get_json())
 
-    User.objects(id=body.id).update_one(
+    Users.objects(id=body.id).update_one(
         weight=body.weight,
         weightUnit=body.weightUnit,
         height=body.height,
@@ -137,7 +137,7 @@ def userPhotoUpdate():
     body = AttrDict(request.get_json())
 
     try:
-        upd = User.objects(id=body.id).update_one(userPhoto=body.userPhoto)
+        upd = Users.objects(id=body.id).update_one(userPhoto=body.userPhoto)
         if upd:
             return jsonify({'id': body.id, 'photoString': body.userPhoto}), status.HTTP_200_OK
         else:
@@ -148,7 +148,7 @@ def userPhotoUpdate():
 
 def changePassword(email):
     try:
-        user = User.objects(email=email).get()
+        user = Users.objects(email=email).get()
         print(user)
 
         userId = user.id
@@ -156,7 +156,7 @@ def changePassword(email):
         resetToken = fern.encrypt('{}r353tT0k3n'.format(userId).encode()).decode('utf-8')
         resetExpiryTime = datetime.now() + timedelta(minutes=30)
 
-        User.objects(id=userId) \
+        Users.objects(id=userId) \
             .update_one(resetPasswordToken=resetToken, resetPasswordExpires=resetExpiryTime)
 
         userName = user.firstName
@@ -202,11 +202,11 @@ def resetPassword():
         print(userId)
 
         try:
-            user = User.objects(id=userId).get()
+            user = Users.objects(id=userId).get()
 
             if datetime.now() < user.resetPasswordExpires:
                 if user.dateOfBirth == dob:
-                    # user = User.objects(id=userId).get().update_one(password=password, resetPasswordExpires=datetime.now())
+                    # user = Users.objects(id=userId).get().update_one(password=password, resetPasswordExpires=datetime.now())
                     user['password'] = password
                     try:
                         user.save()

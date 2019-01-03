@@ -1,22 +1,22 @@
 from flask.json import JSONEncoder, JSONDecoder
 from flask_mongoengine import BaseQuerySet
-from app.models.user import User, Messages
-from app.models.meal import Meal
-from app.models.medicines import Medicine
-from app.models.symptoms import Symptom
-from app.models.appData import AppData
+from app.models.user import Users, Messages
+from app.models.meal import Meals
+from app.models.medicines import Medicines
+from app.models.symptoms import Symptoms
+from app.models.appData import App_Data
 
 from mongoengine import DoesNotExist
 
 class Encoder(JSONEncoder):
     def default(self, obj):
-        if isinstance(obj, AppData):
+        if isinstance(obj, App_Data):
             return {
                 '_id': str(obj.id),
                 'aboutSection': obj.aboutSection,
                 'references': obj.references
             }
-        elif isinstance(obj, User):
+        elif isinstance(obj, Users):
             return {
                 '_id' : str(obj.id),
                 'email': obj.email,
@@ -55,7 +55,7 @@ class Encoder(JSONEncoder):
                 'createDate':obj.createDate,
                 'readFlag':obj.readFlag
             }
-        elif isinstance(obj, Meal):
+        elif isinstance(obj, Meals):
             return {
                 '_id':str(obj.id),
                 'name': obj.name,
@@ -71,7 +71,7 @@ class Encoder(JSONEncoder):
                 'directions': obj.directions,
                 'photoURL': obj.photoURL
             }
-        elif isinstance(obj, Medicine):
+        elif isinstance(obj, Medicines):
             return {
                 '_id': str(obj.id),
                 'name': obj.name,
@@ -79,7 +79,7 @@ class Encoder(JSONEncoder):
                 'instructions': obj.instructions,
                 'ingredients': [ing for ing in obj.ingredients]
             }
-        elif isinstance(obj, Symptom):
+        elif isinstance(obj, Symptoms):
             return {
                 '_id': str(obj.id),
                 'name': obj.name,
@@ -97,17 +97,17 @@ class Encoder(JSONEncoder):
 class Decoder(JSONDecoder):
     def default(self, obj):
         #print(type(obj))
-        if isinstance(obj, User):
+        if isinstance(obj, Users):
             return {
                 'email': obj.email,
                 'firstName': obj.firstName,
                 'lastName': obj.lastName
             }
-        elif isinstance(obj, Meal):
+        elif isinstance(obj, Meals):
             pass
-        elif isinstance(obj, Medicine):
+        elif isinstance(obj, Medicines):
             pass
-        elif isinstance(obj, Symptom):
+        elif isinstance(obj, Symptoms):
             pass
         elif isinstance(obj, BaseQuerySet):
             ret = []

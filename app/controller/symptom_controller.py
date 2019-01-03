@@ -4,8 +4,8 @@ from flask.json import jsonify
 from flask_api import status
 from mongoengine.errors import NotUniqueError, DoesNotExist
 
-from app.models.medicines import Medicine
-from app.models.symptoms import Symptom
+from app.models.medicines import Medicines
+from app.models.symptoms import Symptoms
 
 '''   /* Add Symptoms in bulk*/ '''
 
@@ -17,16 +17,16 @@ def bulkSymptomsUpload():
         for med in symp['medicines']:
             medSearchArr.append(med['name'])
         try:
-            medicine = Medicine.objects(name__in=medSearchArr)
+            medicine = Medicines.objects(name__in=medSearchArr)
             medArr = []
             for medRef in medicine:
                 medArr.append(medRef)
             symptom = None
             try:
-                symptom = Symptom.objects(name=symp['symptom']['name'])
+                symptom = Symptoms.objects(name=symp['symptom']['name'])
             except DoesNotExist:
-                symptom = Symptom(name=symp['symptom']['name'], medicines=medArr,
-                                  indications=symp['indications'] if 'indications' in symp else None)
+                symptom = Symptoms(name=symp['symptom']['name'], medicines=medArr,
+                                   indications=symp['indications'] if 'indications' in symp else None)
                 try:
                     symptom.save()
                 except Exception as e:
@@ -41,21 +41,21 @@ def bulkSymptomsUpload():
 
 
 def first5Symptoms():
-    return jsonify(Symptom.objects[:5]), status.HTTP_200_OK
+    return jsonify(Symptoms.objects[:5]), status.HTTP_200_OK
 
 
-''' Search Symptom'''
+''' Search Symptoms'''
 
 
 def searchSymptom(searchParam):
-    return jsonify(Symptom.objects(name__icontains=searchParam)), status.HTTP_200_OK
+    return jsonify(Symptoms.objects(name__icontains=searchParam)), status.HTTP_200_OK
 
 
 ''' Get all symptoms'''
 
 
 def getAllSymptoms():
-    return jsonify(Symptom.objects), status.HTTP_200_OK
+    return jsonify(Symptoms.objects), status.HTTP_200_OK
 
 
 ''' Delete symptoms '''
@@ -64,7 +64,7 @@ def getAllSymptoms():
 def deleteSymptoms():
     idArr = request.get_json()
     try:
-        delSymps = Symptom.objects(id__in=idArr)
+        delSymps = Symptoms.objects(id__in=idArr)
         if delSymps:
             delSymps = delSymps.delete()
             return jsonify(delSymps), status.HTTP_200_OK
@@ -78,8 +78,8 @@ def addNewSymptom():
     data = AttrDict(request.get_json())
 
     try:
-        newSymp = Symptom(name=data.name, indications=data.indications,
-                          medicines=[med for med in data.medicines]).save()
+        newSymp = Symptoms(name=data.name, indications=data.indications,
+                           medicines=[med for med in data.medicines]).save()
 
         return jsonify(newSymp)
     except NotUniqueError:
