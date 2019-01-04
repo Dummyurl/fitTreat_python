@@ -1,6 +1,6 @@
 from flask import render_template, redirect, url_for, jsonify, request
 from app.models.user import User
-from app import app
+from app import app,Config
 import smtplib
 from email.mime.text import MIMEText
 
@@ -111,15 +111,15 @@ def postData():
 def mailTest():
     msg = MIMEText('<h1>This is a test mail from python.</h1><h4>Sub-heading</h4>', 'html')
     msg['Subject'] = 'Python Mail Test'
-    msg['From'] = 'consult.saurabh@gmail.com'
-    msg['To'] = 'consult.saurabh@gmail.com'
+    msg['From'] = Config.userId
+    msg['To'] = 'balu251994@gmail.com'
 
     try:
-        s = smtplib.SMTP('smtp.gmail.com', 587)
+        s = smtplib.SMTP(Config.smtp_host, Config.smtp_port)
         s.ehlo()
         s.starttls()
-        s.login('consult.saurabh@gmail.com', 'D@4d3D!l')
-        s.sendmail('consult.saurabh@gmail.com', ['consult.saurabh@gmail.com', 'balu251994@gmail.com'], msg.as_string())
+        s.login(Config.userId, Config.password)
+        s.sendmail(Config.userId, ['balu251994@gmail.com'], msg.as_string())
         s.close()
         print('mail sent')
         return 'Mail sent'
