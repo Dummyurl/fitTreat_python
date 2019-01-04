@@ -17,8 +17,8 @@ class Config(object):
     smtp_port = 465
     password = '7ipagxql9861'
     dbName = 'fit_treat'
-    # uri = env.uris[0] or 'localhost:8888'
-    uri = 'localhost:8888'
+    uri = env.uris[0] or 'localhost:8888'
+    # uri = 'localhost:8888'
     MONGODB_SETTINGS = {
         'db': dbName,
         'host': 'mongodb://fitTreat:Welcome12#@ds119343.mlab.com:19343/' + dbName,
