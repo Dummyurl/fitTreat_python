@@ -33,7 +33,6 @@ def passwordResetRedirect():
     if id and token:
         try:
             user = User.objects(id=id).get()
-
             print('user.id', user.id)
             print('userId', id)
             print('token', token)
