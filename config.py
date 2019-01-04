@@ -13,11 +13,11 @@ class Config(object):
     port = os.getenv("PORT") or 8888
     s3URL = 'https://s3.us-east-2.amazonaws.com/fittreatstorage/meal_images_dev/'
     userId = os.getenv("SENDGRID_USERNAME")
-    print("SMTP User Name : " + userId)
     password = os.getenv("SENDGRID_PASSWORD")
     smtp_host = os.getenv("SMTP_HOST")
-    print("SMTP Host : " + smtp_host)
     smtp_port = os.getenv("SMTP_PORT")
+    # uri = env.uris[0] or 'localhost:8888'
+    uri = os.getenv("uri") or 'localhost:8888'
     dbName = 'fit_treat'
     MONGODB_SETTINGS = {
         'db': dbName,
