@@ -111,7 +111,7 @@ def postData():
 def mailTest():
     msg = MIMEText('<h1>This is a test mail from python.</h1><h4>Sub-heading</h4>', 'html')
     msg['Subject'] = 'Python Mail Test'
-    msg['From'] = Config.userId
+    msg['From'] = 'FitTreat ' + Config.userId
     msg['To'] = 'balu251994@gmail.com'
 
     try:

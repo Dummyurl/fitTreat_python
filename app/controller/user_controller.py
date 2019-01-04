@@ -166,7 +166,7 @@ def changePassword(email):
 
         msg = MIMEText(render_template('changePassword.html', username=userName, link=link), 'html')
         msg['Subject'] = 'FitTreat : Password Reset'
-        msg['From'] = 'FitTreat app116066240@heroku.com'
+        msg['From'] = 'FitTreat ' + Config.userId
         msg['To'] = email
 
         try:
