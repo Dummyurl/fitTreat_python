@@ -12,10 +12,10 @@ class Config(object):
     crptrKey = b'WWUV2cX5GVM5K2iFu_MauyOoecTvUNGabtpG4z8TAEY='
     port = os.getenv("PORT") or 8888
     s3URL = 'https://s3.us-east-2.amazonaws.com/fittreatstorage/meal_images_dev/'
-    userId = 'app116066240@heroku.com' # fitTreat Heroku Account
+    userId = 'app120884642@heroku.com' # fitTreat Heroku Account
     smtp_host = 'smtp.sendgrid.net'
     smtp_port = 465
-    password = 'Welcome12#'
+    password = '7ipagxql9861'
     dbName = 'fit_treat'
     # uri = env.uris[0] or 'localhost:8888'
     uri = 'localhost:8888'
