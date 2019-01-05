@@ -23,3 +23,4 @@ class Meal(Document):
     ingredients = StringField()
     directions = StringField()
     photoURL = StringField()
+    servingSize = IntField(default=0)
