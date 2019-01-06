@@ -69,7 +69,8 @@ class Encoder(JSONEncoder):
                 'nutritionInfo': obj.nutritionInfo,
                 'ingredients': obj.ingredients,
                 'directions': obj.directions,
-                'photoURL': obj.photoURL
+                'photoURL': obj.photoURL,
+                'servingSize':obj.servingSize
             }
         elif isinstance(obj, Medicine):
             return {
