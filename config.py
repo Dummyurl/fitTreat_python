@@ -12,8 +12,8 @@ class Config(object):
     crptrKey = b'WWUV2cX5GVM5K2iFu_MauyOoecTvUNGabtpG4z8TAEY='
     port = os.getenv("PORT") or 8888
     s3URL = os.getenv("S3_URL") or 'https://s3.us-east-2.amazonaws.com/fittreatstorage/meal_images_dev/'
-    userId = os.getenv("SENDGRID_USERNAME") or 'balu251994@gmail.com'
-    password = os.getenv("SENDGRID_PASSWORD") or 'MasterMail1@'
+    userId = os.getenv("SENDGRID_USERNAME")
+    password = os.getenv("SENDGRID_PASSWORD")
     smtp_host = os.getenv("SMTP_HOST") or 'smtp.gmail.com'
     smtp_port = os.getenv("SMTP_PORT") or 587
     # uri = env.uris[0] or 'localhost:8888'

@@ -160,7 +160,7 @@ def changePassword(email):
             .update_one(resetPasswordToken=resetToken, resetPasswordExpires=resetExpiryTime)
 
         userName = user.firstName
-        link = "http://" + Config.uri + "/api/passwordResetRedirect?token=" + resetToken + "&id=" + str(userId)
+        link = Config.uri + "/api/passwordResetRedirect?token=" + resetToken + "&id=" + str(userId)
 
         # return render_template('changePassword.html', username=userName, link=link)
 
