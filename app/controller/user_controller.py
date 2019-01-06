@@ -96,7 +96,7 @@ def updateGoalWeight():
     body = AttrDict(request.get_json())
     try:
         User.objects(id=body.id).update_one(targetWeight=int(body.targetWeight),
-                                            targetDate=str(datetime.fromtimestamp(body.targetDate/1000)), targetCalories=int(body.targetCalories),
+                                            targetDate=str(datetime.fromtimestamp(int(body.targetDate)/1000)), targetCalories=int(body.targetCalories),
                                             weightUnit=body.weightUnit)
 
         return jsonify({'status': 'success'}), status.HTTP_200_OK
