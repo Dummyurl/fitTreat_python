@@ -316,7 +316,7 @@ def updateMeal(meal_id):
             foodPreference=data.foodPreference,
             cuisine=data.cuisine,
             dietType=[dt for dt in data.dietType],
-            #idealMedCond=[imc for imc in data.idealMedCond],
+            idealMedCond=[imc for imc in data.idealMedCond],
             avoidableMedCond=[amc for amc in data.avoidableMedCond],
             course=data.course,
             calories=data.calories,
