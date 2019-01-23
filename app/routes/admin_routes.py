@@ -30,8 +30,9 @@ def addNewMeal():
 
 
 ''' /* Update Meal  */ ''' #done
-@app.route('/admin/updateMeal/<id>', methods=['PUT'])
+@app.route('/admin/updateMeal/<meal_id>', methods=['PUT'])
 def updateMeal(meal_id):
+    print("Meal ID : " + meal_id)
     return meal_controller.updateMeal(meal_id)
 
 
