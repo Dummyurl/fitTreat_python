@@ -118,18 +118,30 @@ def reloadMessages(id):
 
 def updateProfile():
     body = AttrDict(request.get_json())
-
-    User.objects(id=body.id).update_one(
-        weight=body.weight,
-        weightUnit=body.weightUnit,
-        height=body.height,
-        heightUnit=body.heightUnit,
-        foodPreference=body.foodPreference,
-        medicalCondition=body.medicalCondition,
-        firstName=body.firstName,
-        lastName=body.lastName
-    )
-
+    user = User.objects(id=body.id).get();
+    if user['foodPreference'] == body.foodPreference:
+        user.update(
+            weight=body.weight,
+            weightUnit=body.weightUnit,
+            height=body.height,
+            heightUnit=body.heightUnit,
+            foodPreference=body.foodPreference,
+            medicalCondition=body.medicalCondition,
+            firstName=body.firstName,
+            lastName=body.lastName
+        )
+    else:
+        user.update(
+            weight=body.weight,
+            weightUnit=body.weightUnit,
+            height=body.height,
+            heightUnit=body.heightUnit,
+            foodPreference=body.foodPreference,
+            medicalCondition=body.medicalCondition,
+            firstName=body.firstName,
+            lastName=body.lastName,
+            mealExpiry=None
+        )
     return activeUser(body.id)
 
 

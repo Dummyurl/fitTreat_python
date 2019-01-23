@@ -13,7 +13,7 @@ from flask_mongoengine import Document
 from mongoengine.base.fields import BaseField, ObjectIdField
 from mongoengine.document import EmbeddedDocument
 from mongoengine.fields import StringField, EmailField, DateTimeField, IntField, \
-    EmbeddedDocumentField, ReferenceField, BooleanField
+    EmbeddedDocumentField, ReferenceField, BooleanField, DecimalField
 
 from app.models.meal import Meal
 
@@ -39,7 +39,7 @@ class User(Document):
     age = IntField(required=True, default=0)
     weight = IntField(required=True, default=0)
     weightUnit = StringField(required=True, default='kg') # choices=['kg', 'lb'])
-    height = IntField(required=True, default=0)
+    height = DecimalField(required=True, default=0)
     heightUnit = StringField(required=True, default='cm') # choices=['cm', 'm', 'ft'])
     foodPreference = StringField(required=True, default='Vegetarian') # choices=['Vegan', 'Vegetarian', 'Non-Vegetarian'])
     timeZone = StringField(default='0')  # Timezone Offset Value

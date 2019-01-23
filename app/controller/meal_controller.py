@@ -182,7 +182,7 @@ def non_veg_meals(assignedMealIds, usersMedicalCondition):
     veg_snacks = Meal.objects(id__nin=assignedMealIds, foodPreference__in=['Vegetarian'], course__in=['Snacks'],
                               avoidableMedCond__ne=usersMedicalCondition)[:veg_plan_count['Snacks']]
     veg_meals = list(veg_breakfast) + list(veg_lunch) + list(veg_dinner) + list(veg_snacks)
-    print("Vege Meals : " + len(veg_meals))
+    print("Vege Meals : " + str(len(veg_meals)))
 
     # ****** Non-Vegetarian Dishes ******
     nonveg_plan_count = meal_plan_count.non_veg['non_veg']
@@ -197,7 +197,7 @@ def non_veg_meals(assignedMealIds, usersMedicalCondition):
                                  avoidableMedCond__ne=usersMedicalCondition)[:nonveg_plan_count['Snacks']]
 
     nonveg_meals = list(nonveg_breakfast) + list(nonveg_lunch) + list(nonveg_dinner) + list(nonveg_snacks)
-    print("Non-Veg Meals : " + len(nonveg_meals))
+    print("Non-Veg Meals : " + str(len(nonveg_meals)))
     return veg_meals + nonveg_meals
 
 
