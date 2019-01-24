@@ -1,5 +1,5 @@
 from flask import render_template, redirect, url_for, jsonify, request
-from app import app
+from app import app, bcrypt
 from app.controller import user_controller
 import flask_bcrypt
 from app.models.user import User
@@ -35,7 +35,7 @@ def login():
     password = request.get_json()['password']
     try:
         user = User.objects(email=email_id).get()
-        if flask_bcrypt.check_password_hash(user['password'], password):
+        if bcrypt.check_password_hash(user['password'], password):
             user['password'] = None
             user['mealAssigned'] = None
             unreadMsg = [msg for msg in user['messages'] if msg['readFlag'] is False]

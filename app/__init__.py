@@ -9,6 +9,8 @@ app = Flask(__name__, static_url_path="/public", static_folder="public")
 CORS(app)
 app.config.from_object(Config)
 mdb = MongoEngine(app)
+from flask_bcrypt import Bcrypt
+bcrypt = Bcrypt(app)
 
 from app import models
 from app.jsonSerializer import Encoder

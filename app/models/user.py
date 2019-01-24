@@ -4,7 +4,7 @@ Created on 18-Dec-2018
 @author: Balkrishna.Meena
 '''
 from datetime import datetime
-import flask_bcrypt
+from app import bcrypt
 from mongoengine.signals import pre_save
 from dateutil import parser, relativedelta
 from bson import ObjectId
@@ -34,14 +34,15 @@ class User(Document):
     password = StringField(required=True)
     resetPasswordToken = StringField()
     resetPasswordExpires = DateTimeField()
-    role = StringField(default='User') # choices=['User', 'Admin'])
+    role = StringField(default='User')  # choices=['User', 'Admin'])
     dateOfBirth = StringField(required=True)  # YYYY/MM/DD Format
     age = IntField(required=True, default=0)
     weight = IntField(required=True, default=0)
-    weightUnit = StringField(required=True, default='kg') # choices=['kg', 'lb'])
-    height = DecimalField(required=True, default=0,precision=1)
-    heightUnit = StringField(required=True, default='cm') # choices=['cm', 'm', 'ft'])
-    foodPreference = StringField(required=True, default='Vegetarian') # choices=['Vegan', 'Vegetarian', 'Non-Vegetarian'])
+    weightUnit = StringField(required=True, default='kg')  # choices=['kg', 'lb'])
+    height = DecimalField(required=True, default=0, precision=1)
+    heightUnit = StringField(required=True, default='cm')  # choices=['cm', 'm', 'ft'])
+    foodPreference = StringField(required=True,
+                                 default='Vegetarian')  # choices=['Vegan', 'Vegetarian', 'Non-Vegetarian'])
     timeZone = StringField(default='0')  # Timezone Offset Value
     bmi = IntField(default=0)
     medicalCondition = StringField()
@@ -57,7 +58,7 @@ class User(Document):
 
     @staticmethod
     def pre_save_func(sender, document):
-        document['password'] = str(flask_bcrypt.generate_password_hash(document['password']).decode('utf-8'))
+        document['password'] = bcrypt.generate_password_hash(document['password']).decode('utf-8')
         dob = parser.parse(document['dateOfBirth'])
         today = datetime.today()
         age = relativedelta.relativedelta(today, dob)
