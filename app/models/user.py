@@ -39,7 +39,7 @@ class User(Document):
     age = IntField(required=True, default=0)
     weight = IntField(required=True, default=0)
     weightUnit = StringField(required=True, default='kg') # choices=['kg', 'lb'])
-    height = DecimalField(required=True, default=0)
+    height = DecimalField(required=True, default=0,precision=1)
     heightUnit = StringField(required=True, default='cm') # choices=['cm', 'm', 'ft'])
     foodPreference = StringField(required=True, default='Vegetarian') # choices=['Vegan', 'Vegetarian', 'Non-Vegetarian'])
     timeZone = StringField(default='0')  # Timezone Offset Value

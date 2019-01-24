@@ -26,11 +26,13 @@ def register():
     data = AttrDict(request.get_json())
     try:
         user = User.objects(email=data.email).get()
+        print(data.email + " : Email already in use")
         obj = {
             'error': "Email already in use"
         }
         return jsonify(obj), status.HTTP_400_BAD_REQUEST
     except DoesNotExist:
+        print("Creating new user")
         msg_content = "Dear " + data.firstName + ", <br><br> Welcome to FitTreat.<br><br> Team FitTreat"
         user = User(
             firstName=data.firstName,

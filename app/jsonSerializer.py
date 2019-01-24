@@ -31,7 +31,7 @@ class Encoder(JSONEncoder):
                 'age': obj.age,
                 'weight': obj.weight,
                 'weightUnit': obj.weightUnit,
-                'height': obj.height,
+                'height': float(obj.height),
                 'heightUnit': obj.heightUnit,
                 'foodPreference': obj.foodPreference,
                 'timeZone': obj.timeZone,
