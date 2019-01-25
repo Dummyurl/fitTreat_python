@@ -13,7 +13,7 @@ from flask_mongoengine import Document
 from mongoengine.base.fields import BaseField, ObjectIdField
 from mongoengine.document import EmbeddedDocument
 from mongoengine.fields import StringField, EmailField, DateTimeField, IntField, \
-    EmbeddedDocumentField, ReferenceField, BooleanField, DecimalField
+    EmbeddedDocumentField, ReferenceField, BooleanField, DecimalField,BinaryField
 
 from app.models.meal import Meal
 
@@ -31,7 +31,7 @@ class User(Document):
     lastName = StringField(required=True, default='')
     email = EmailField(required=True)
     gender = StringField(required=True, default='Male')  # choices=['Male', 'Female', 'Other'])
-    password = StringField(required=True)
+    password = BinaryField()
     resetPasswordToken = StringField()
     resetPasswordExpires = DateTimeField()
     role = StringField(default='User')  # choices=['User', 'Admin'])
@@ -58,7 +58,7 @@ class User(Document):
 
     @staticmethod
     def pre_save_func(sender, document):
-        document['password'] = bcrypt.generate_password_hash(document['password']).decode('utf-8')
+        document['password'] = bcrypt.generate_password_hash(document['password'])
         dob = parser.parse(document['dateOfBirth'])
         today = datetime.today()
         age = relativedelta.relativedelta(today, dob)
