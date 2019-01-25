@@ -34,28 +34,35 @@ def register():
     except DoesNotExist:
         print("Creating new user")
         msg_content = "Dear " + data.firstName + ", <br><br> Welcome to FitTreat.<br><br> Team FitTreat"
-        user = User(
-            firstName=data.firstName,
-            lastName=data.lastName,
-            email=data.email,
-            gender=data.gender,
-            password=data.password,
-            dateOfBirth=data.dateOfBirth,
-            # age=data.age if data.age else 0,
-            weight=data.weight,
-            weightUnit=data.weightUnit,
-            height=data.height,
-            heightUnit=data.heightUnit,
-            foodPreference=data.foodPreference,
-            timeZone=data.timeZone,
-            medicalCondition=data.medicalCondition,
-            messages=[Messages(subject="Welcome", content=msg_content)]
-        )
-        user = user.save()
-        user['password'] = None
-        unreadMsg = [msg for msg in user['messages'] if msg['readFlag'] is False]
-        user['unreadCount'] = len(unreadMsg)
-        return jsonify(user), status.HTTP_200_OK
+        try:
+            user = User(
+                firstName=data.firstName,
+                lastName=data.lastName,
+                email=data.email,
+                gender=data.gender,
+                password=data.password,
+                dateOfBirth=data.dateOfBirth,
+                # age=data.age if data.age else 0,
+                weight=data.weight,
+                weightUnit=data.weightUnit,
+                height=data.height,
+                heightUnit=data.heightUnit,
+                foodPreference=data.foodPreference,
+                timeZone=data.timeZone,
+                medicalCondition=data.medicalCondition,
+                messages=[Messages(subject="Welcome", content=msg_content)]
+            )
+            user = user.save()
+            user['password'] = None
+            unreadMsg = [msg for msg in user['messages'] if msg['readFlag'] is False]
+            user['unreadCount'] = len(unreadMsg)
+            return jsonify(user), status.HTTP_200_OK
+        except Exception as e:
+            print("Error in user registration :" + format(e))
+            obj = {
+                'error': "Some error occurred"
+            }
+            return jsonify(obj), status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
 ''' /*** Returns Active User Details ***/ '''
@@ -70,6 +77,7 @@ def activeUser(user_id):
         user['unreadCount'] = len(unreadMsg)
         return jsonify(user), status.HTTP_200_OK
     except DoesNotExist as e:
+        print("Error occurred in activeUser method : " + format(e))
         return jsonify({'stat': 'Some error occurred : ' + format(e)}), status.HTTP_400_BAD_REQUEST
 
 
@@ -88,9 +96,10 @@ def messageReadStatusChange(user_id, msg_id):
                     msg.save()
                     return jsonify(msg)
                 except Exception as e:
-                    print(e)
+                    print("Error in saving message status : " + format(e))
                     return 'Error in saving message status'
     except Exception as e:
+        print("Error in message read status : " + format(e))
         return jsonify({'stat': 'Some error occurred', 'error': format(e)}), status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
@@ -121,31 +130,36 @@ def reloadMessages(id):
 def updateProfile():
     body = AttrDict(request.get_json())
     user = User.objects(id=body.id).get();
-    if user['foodPreference'] == body.foodPreference:
-        user.update(
-            weight=body.weight,
-            weightUnit=body.weightUnit,
-            height=body.height,
-            heightUnit=body.heightUnit,
-            foodPreference=body.foodPreference,
-            medicalCondition=body.medicalCondition,
-            firstName=body.firstName,
-            lastName=body.lastName
-        )
-    else:
-        user.update(
-            weight=body.weight,
-            weightUnit=body.weightUnit,
-            height=body.height,
-            heightUnit=body.heightUnit,
-            foodPreference=body.foodPreference,
-            medicalCondition=body.medicalCondition,
-            firstName=body.firstName,
-            lastName=body.lastName,
-            mealExpiry=None,
-            mealAssigned=[]
-        )
-    return activeUser(body.id)
+    try:
+        if user['foodPreference'] != body.foodPreference or user['medicalCondition'] != body.medicalCondition:
+            user.update(
+                weight=body.weight,
+                weightUnit=body.weightUnit,
+                height=body.height,
+                heightUnit=body.heightUnit,
+                foodPreference=body.foodPreference,
+                medicalCondition=body.medicalCondition,
+                firstName=body.firstName,
+                lastName=body.lastName,
+                mealExpiry=None,
+                mealAssigned=[]
+            )
+        else:
+            user.update(
+                weight=body.weight,
+                weightUnit=body.weightUnit,
+                height=body.height,
+                heightUnit=body.heightUnit,
+                foodPreference=body.foodPreference,
+                medicalCondition=body.medicalCondition,
+                firstName=body.firstName,
+                lastName=body.lastName,
+            )
+        return activeUser(body.id)
+    except Exception as e:
+        print("Error occurred in profile update : " + format(e))
+        return jsonify({'error': 'Some error occurred'}), status.HTTP_500_INTERNAL_SERVER_ERROR
+
 
 
 def userPhotoUpdate():

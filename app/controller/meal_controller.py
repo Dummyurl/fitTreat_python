@@ -255,6 +255,7 @@ def getMeals(userId):
             user.save()
             return jsonify(user['mealAssigned']), status.HTTP_200_OK
     except Exception as e:
+        print("Error occurred in meal assignment : " + format(e))
         return format(e), status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
@@ -276,7 +277,7 @@ def filterMeals(type, foodPref, userId):
         nonVegLimit = 0;
         if type == 'Snack' or 'Soup' or 'Juice':
             exstMealSrchFlag = True
-        if foodPref == 'Non-Vegetarian':
+        if foodPref == 'Non-Vegetarian' or foodPref == 'None':
             foodPrefArr = ['Vegan', 'Vegetarian']
             vegLimit = 5
             nonVegLimit = 5
@@ -291,7 +292,7 @@ def filterMeals(type, foodPref, userId):
         else:
             vegQuery = Meal.objects(foodPreference__in=foodPrefArr, course__in=srchArr,
                                     avoidableMedCond__ne=usersMedicalCondition)[:vegLimit]
-            if foodPref == 'Non-Vegetarian':
+            if foodPref == 'Non-Vegetarian' or foodPref == 'None':
                 nonVegQuery = Meal.objects(foodPreference__in=['Non-Vegetarian'], course__in=srchArr,
                                            avoidableMedCond__ne=usersMedicalCondition)[:nonVegLimit]
                 res = list(vegQuery) + list(nonVegQuery)
