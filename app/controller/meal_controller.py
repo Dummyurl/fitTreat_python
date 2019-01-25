@@ -249,10 +249,10 @@ def getMeals(userId):
             tzinf = tz.tz.tzoffset('TZONE', int(user['timeZone']) / 1000)
             localCurrentTime = utils.default_tzinfo(datetime.now(), tzinf)  # datetime.now(tz=tzinf)
             expiryTime = localCurrentTime + timedelta(days=1)
-            user['mealExpiry'] = utils.default_tzinfo(expiryTime.replace(hour=5, minute=0, second=0, microsecond=0),
+            mealExpiry = utils.default_tzinfo(expiryTime.replace(hour=5, minute=0, second=0, microsecond=0),
                                                       tzinf)
-            user['mealAssigned'] = generated_plan
-            user.save()
+            #user['mealAssigned'] = generated_plan
+            user.modify(mealExpiry=mealExpiry,mealAssigned=generated_plan)
             return jsonify(user['mealAssigned']), status.HTTP_200_OK
     except Exception as e:
         print("Error occurred in meal assignment : " + format(e))

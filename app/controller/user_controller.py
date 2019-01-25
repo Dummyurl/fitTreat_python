@@ -132,7 +132,7 @@ def updateProfile():
     user = User.objects(id=body.id).get();
     try:
         if user['foodPreference'] != body.foodPreference or user['medicalCondition'] != body.medicalCondition:
-            user.update(
+            user.modify(
                 weight=body.weight,
                 weightUnit=body.weightUnit,
                 height=body.height,
@@ -145,7 +145,7 @@ def updateProfile():
                 mealAssigned=[]
             )
         else:
-            user.update(
+            user.modify(
                 weight=body.weight,
                 weightUnit=body.weightUnit,
                 height=body.height,
