@@ -142,7 +142,8 @@ def updateProfile():
             medicalCondition=body.medicalCondition,
             firstName=body.firstName,
             lastName=body.lastName,
-            mealExpiry=None
+            mealExpiry=None,
+            mealAssigned=[]
         )
     return activeUser(body.id)
 
