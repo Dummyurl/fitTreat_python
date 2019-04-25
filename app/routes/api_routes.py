@@ -6,6 +6,8 @@ from mongoengine import DoesNotExist
 from datetime import datetime, timedelta
 from flask_api import status
 
+# API Endpoints to be used in Android Application
+
 ''' /*** Pull Active User Details ***/ '''  # done Tested
 
 

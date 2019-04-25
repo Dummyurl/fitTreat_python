@@ -3,9 +3,10 @@ import os
 
 env = AppEnv()
 
+
 print(env)
-#print(env.__dict__)
-#print(dir(env))
+
+# Configuration File for application variables
 
 class Config(object): 
     #crptrKey = 'R@nd0m5tr1ngt0g3ner@t3Pa55w0rd'

@@ -6,7 +6,7 @@ from app.models.user import User
 from mongoengine.errors import DoesNotExist
 from flask_api import status
 
-
+''' /*** API Route to test application ***/ '''
 @app.route('/auth/test')
 def test():
     str = 'Balkrishna'
@@ -31,11 +31,13 @@ def register():
 
 @app.route('/auth/login', methods=['POST'])
 def login():
+    # Retrieve Email and Password
     email_id = request.get_json()['email']
     password = request.get_json()['password']
     try:
         user = User.objects(email=email_id).get()
         if bcrypt.check_password_hash(user['password'], password):
+            ''' Checks password - If correct login is successful '''
             user['password'] = None
             user['mealAssigned'] = None
             unreadMsg = [msg for msg in user['messages'] if msg['readFlag'] is False]
@@ -43,5 +45,7 @@ def login():
             return jsonify(user), status.HTTP_200_OK
         else:
             return jsonify({'error': 'Invalid Credentials'}), status.HTTP_401_UNAUTHORIZED
+            ''' returns response if credentials invalid '''
     except DoesNotExist:
+        ''' returns response if User ID doesn't exist in database '''
         return jsonify({'error': 'User does not exist'}), status.HTTP_401_UNAUTHORIZED

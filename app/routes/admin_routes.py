@@ -11,6 +11,8 @@ import bson
 from app import app, mdb
 from app.controller import appData_controller, meal_controller, medicine_controller, symptom_controller
 
+# API Endpoints to be used in Application Administration Panel
+
 ''' /* Edit App Data  */ ''' #done - tested
 @app.route('/admin/editAppData/<id>', methods=['PUT'])
 def editAppData(id):

@@ -6,6 +6,9 @@ from app.models.medicines import Medicine
 from app.models.symptoms import Symptom
 from app.models.appData import AppData
 
+# Converts Python Objects to JSON Objects
+# All the data bindings in Android Application is through JSON therefore conversion is necessary
+
 from mongoengine import DoesNotExist
 
 class Encoder(JSONEncoder):

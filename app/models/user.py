@@ -17,6 +17,7 @@ from mongoengine.fields import StringField, EmailField, DateTimeField, IntField,
 
 from app.models.meal import Meal
 
+#  MongoDB Document for Messages
 
 class Messages(EmbeddedDocument):
     subject = StringField()
@@ -25,6 +26,7 @@ class Messages(EmbeddedDocument):
     content = StringField()
     _id = ObjectIdField(default=ObjectId)
 
+#  MongoDB Document for User
 
 class User(Document):
     firstName = StringField(required=True)

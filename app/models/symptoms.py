@@ -8,6 +8,7 @@ from mongoengine.fields import StringField, ReferenceField
 from mongoengine.fields import ListField
 from app.models.medicines import Medicine
 
+#  MongoDB Document for Symptom
 
 class Symptom(Document):
     name = StringField(required=True, unique=True)
