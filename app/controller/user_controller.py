@@ -19,7 +19,10 @@ from flask_api import status
 import smtplib
 from email.mime.text import MIMEText
 
-'''    /*** New Registration ***/ '''
+'''    
+Context - Android Application
+/*** New Registration ***/ 
+'''
 
 
 def register():
@@ -81,7 +84,11 @@ def activeUser(user_id):
         return jsonify({'stat': 'Some error occurred : ' + format(e)}), status.HTTP_400_BAD_REQUEST
 
 
-''' /*** Updates message read/unread status ***/ '''
+''' 
+Context - Android Application
+/*** Updates message read/unread status ***/ 
+Used to mark messages in the inbox as Read/Unread
+'''
 
 
 def messageReadStatusChange(user_id, msg_id):
@@ -102,7 +109,10 @@ def messageReadStatusChange(user_id, msg_id):
         print("Error in message read status : " + format(e))
         return jsonify({'stat': 'Some error occurred', 'error': format(e)}), status.HTTP_500_INTERNAL_SERVER_ERROR
 
-
+''' 
+Context - Android Application
+API to update goal weight/target weight
+'''
 def updateGoalWeight():
     body = AttrDict(request.get_json())
     try:
@@ -114,7 +124,10 @@ def updateGoalWeight():
     except DoesNotExist:
         return jsonify({'stat': 'No such user found'}), status.HTTP_400_BAD_REQUEST
 
-
+''' 
+Context - Android Application
+API to reload messages in the inbox
+'''
 def reloadMessages(id):
     try:
         user = User.objects(id=id).get()
@@ -126,7 +139,10 @@ def reloadMessages(id):
     except DoesNotExist:
         return jsonify({'stat': 'No such user found'}), status.HTTP_400_BAD_REQUEST
 
-
+''' 
+Context - Android Application
+Method to update user profile
+'''
 def updateProfile():
     body = AttrDict(request.get_json())
     user = User.objects(id=body.id).get();
@@ -161,7 +177,10 @@ def updateProfile():
         return jsonify({'error': 'Some error occurred'}), status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
-
+''' 
+Context - Android Application
+Method to update user photo
+'''
 def userPhotoUpdate():
     body = AttrDict(request.get_json())
 
@@ -174,7 +193,10 @@ def userPhotoUpdate():
     except DoesNotExist:
         return jsonify({'stat': 'No such user found'}), status.HTTP_400_BAD_REQUEST
 
-
+''' 
+Context - Android Application
+Method to change user password
+'''
 def changePassword(email):
     try:
         user = User.objects(email=email).get()
@@ -214,7 +236,11 @@ def changePassword(email):
     except DoesNotExist:
         return jsonify({'stat': 'No user found with email - {}'.format(email)}), status.HTTP_404_NOT_FOUND
 
-
+''' 
+Context - Android Application
+Method to reset password of the user
+-Called from external link which user receives in the email
+'''
 def resetPassword():
     try:
         body = AttrDict(request.get_json())

@@ -7,6 +7,10 @@ from mongoengine import NotUniqueError
 from app.models.medicines import Medicine
 from flask_api import status
 
+''' 
+Context - App Administration
+API to add medicines to the database
+'''
 
 def addMedicines():
     data = request.get_json()
@@ -15,10 +19,17 @@ def addMedicines():
                                              ingredients=[ing for ing in med['ingredients']]) for med in data])
     return jsonify(meds), status.HTTP_200_OK
 
-
+''' 
+Context - App Administration
+API to get all the medicines in the database 
+'''
 def getAllMedicines():
     return jsonify(Medicine.objects), status.HTTP_200_OK
 
+''' 
+Context - App Administration
+API to delete all the medicines from the DB 
+'''
 
 def deleteMeds():
     idArr = request.get_json()
@@ -32,7 +43,10 @@ def deleteMeds():
     except Exception as e:
         return jsonify({'Error': format(e)}), status.HTTP_404_NOT_FOUND
 
-
+''' 
+Context - App Administration
+API to add new medicine
+'''
 def addNewMedicine():
     data = AttrDict(request.get_json())
     try:

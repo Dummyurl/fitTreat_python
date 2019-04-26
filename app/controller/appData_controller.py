@@ -9,7 +9,7 @@ from flask_api import status
 
 from app.models.appData import AppData
 
-
+''' Used to set Application Data '''
 def setAppDefaultData(id):
     data = AttrDict(request.get_json())
     try:
@@ -20,6 +20,6 @@ def setAppDefaultData(id):
         print('Error while saving app data', e)
         return jsonify({'Error': format(e)}), status.HTTP_400_BAD_REQUEST
 
-
+''' Used to serve Application Data to requesting source'''
 def getAppDefaultData():
     return jsonify(AppData.objects.get()), status.HTTP_200_OK

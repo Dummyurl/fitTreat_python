@@ -7,7 +7,10 @@ from mongoengine.errors import NotUniqueError, DoesNotExist
 from app.models.medicines import Medicine
 from app.models.symptoms import Symptom
 
-'''   /* Add Symptoms in bulk*/ '''
+'''   
+Context - App Administration
+/* Add Symptoms in bulk*/ 
+'''
 
 
 def bulkSymptomsUpload():
@@ -39,28 +42,40 @@ def bulkSymptomsUpload():
     return jsonify({'status': 'Data inserted successfully'}), 200
 
 
-''' Initial Symptoms'''
+''' 
+Context - Android Application
+Returns Symptoms to be displayed on "Search Symptoms" screen
+'''
 
 
 def first5Symptoms():
     return jsonify(Symptom.objects[:5]), status.HTTP_200_OK
 
 
-''' Search Symptom'''
+''' 
+Context - Android Application
+Used to Search Symptom
+'''
 
 
 def searchSymptom(searchParam):
     return jsonify(Symptom.objects(name__icontains=searchParam)), status.HTTP_200_OK
 
 
-''' Get all symptoms'''
+''' 
+Context - Application Administration
+Get all symptoms
+'''
 
 
 def getAllSymptoms():
     return jsonify(Symptom.objects), status.HTTP_200_OK
 
 
-''' Delete symptoms '''
+''' 
+Context - Application Administration
+Delete symptoms 
+'''
 
 
 def deleteSymptoms():
@@ -76,6 +91,10 @@ def deleteSymptoms():
         return jsonify({'stat': 'Unable to delete symptoms - {}'.format(e)}), status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
+''' 
+Context - Application Administration
+Add new symptom to database 
+'''
 def addNewSymptom():
     data = AttrDict(request.get_json())
 

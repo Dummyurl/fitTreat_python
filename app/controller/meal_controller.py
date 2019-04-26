@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 
 from mongoengine import NotUniqueError
 
-
+''' API to add new meal to the database'''
 def addNewMeal():
     data = AttrDict(request.get_json())
     try:
@@ -38,7 +38,7 @@ def addNewMeal():
         return jsonify({'Error': 'Error while saving meal - {}'.format(e)}), status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
-''' /* Add Meals in bulk '''
+''' /* API to Add Meals in bulk to the database'''
 
 
 def addMealData():
@@ -72,6 +72,8 @@ def addMealData():
 
 
 '''
+
+Meal Plan Generation Logic
 /* Assign Meals to the user 
         - User's food preferences
         - User's Medical Condition
